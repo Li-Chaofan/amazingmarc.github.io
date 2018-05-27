@@ -1,0 +1,734 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java, Meituan" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="java8 中在java.util.function中引入了很多函数接口，我们详对其中几个主要接口做一下说明。包括 Supplier, Consumer, Function, BinaryOperator, Predicatey以及 BiSupplier,BiConsumer,BiFunction,BiPredicate。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java8的几个主要函数接口">
+<meta property="og:url" content="http://yoursite.com/2017/05/27/java8的几个主要函数接口/index.html">
+<meta property="og:site_name" content="LiChaofan">
+<meta property="og:description" content="java8 中在java.util.function中引入了很多函数接口，我们详对其中几个主要接口做一下说明。包括 Supplier, Consumer, Function, BinaryOperator, Predicatey以及 BiSupplier,BiConsumer,BiFunction,BiPredicate。">
+<meta property="og:updated_time" content="2018-05-27T12:31:57.312Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java8的几个主要函数接口">
+<meta name="twitter:description" content="java8 中在java.util.function中引入了很多函数接口，我们详对其中几个主要接口做一下说明。包括 Supplier, Consumer, Function, BinaryOperator, Predicatey以及 BiSupplier,BiConsumer,BiFunction,BiPredicate。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/27/java8的几个主要函数接口/"/>
+
+
+
+
+
+  <title> java8的几个主要函数接口 | LiChaofan </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LiChaofan</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/27/java8的几个主要函数接口/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LiChaofan">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                java8的几个主要函数接口
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-27T20:29:00+08:00">
+                2017-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>java8 中在java.util.function中引入了很多函数接口，我们详对其中几个主要接口做一下说明。包括 Supplier, Consumer, Function, BinaryOperator, Predicatey以及 BiSupplier,BiConsumer,BiFunction,BiPredicate。<br><a id="more"></a></p>
+<h1 id="顾名思义"><a href="#顾名思义" class="headerlink" title="顾名思义"></a>顾名思义</h1><ul>
+<li><p>supplier : 提供者</p>
+</li>
+<li><p>consumer : 消费者</p>
+</li>
+<li><p>function : 函数</p>
+</li>
+<li><p>operation : 运算符</p>
+</li>
+<li><p>binary : 二元 （二元一次方程）</p>
+</li>
+<li><p>predicate : 断言</p>
+</li>
+</ul>
+<h1 id="Supplier接口"><a href="#Supplier接口" class="headerlink" title="Supplier接口"></a>Supplier接口</h1><p>该接口不接受任何参数但是提供一个返回值，使用get()方法获取返回值，定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Supplier</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * Gets a result.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@return</span> a result</div><div class="line">     */</span></div><div class="line">    <span class="function">T <span class="title">get</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Supplier&lt;Map&lt;String, String&gt;&gt; supplier = HashMap::<span class="keyword">new</span>;</div><div class="line">supplier.get().put(<span class="string">"1"</span>, <span class="string">"2"</span>);</div></pre></td></tr></table></figure>
+<h1 id="Consumer接口"><a href="#Consumer接口" class="headerlink" title="Consumer接口"></a>Consumer接口</h1><p>该接口对应的方法接收一个参数，然后对其消费，没有返回值，一般来说使用Consumer接口往往伴随着一些期望状态的改变或者事件的发生,例如最典型的forEach就是使用的Consumer接口，虽然没有任何的返回值，但是对每个元素进行了处理。</p>
+<p>该接口定义如下(省略了andThen方法)：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Consumer</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * Performs this operation on the given argument.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> t the input argument</div><div class="line">     */</span></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">accept</span><span class="params">(T t)</span></span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">例如：</div><div class="line"></div><div class="line">```java</div><div class="line"> Consumer&lt;String&gt; consumer = s -&gt; System.out.println(s);</div><div class="line"> <span class="comment">//在控制台打印“lichaofan”</span></div><div class="line"> consumer.accept(<span class="string">"lichaofan"</span>);</div></pre></td></tr></table></figure></p>
+<h2 id="BiConsumer"><a href="#BiConsumer" class="headerlink" title="BiConsumer"></a>BiConsumer</h2><p>该接口是Consumer的升级版，接收两个参数进行消费，定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</div><div class="line"> * Represents an operation that accepts two input arguments and returns no</div><div class="line"> * result.  This is the two-arity specialization of &#123;<span class="doctag">@link</span> Consumer&#125;.</div><div class="line"> * Unlike most other functional interfaces, &#123;<span class="doctag">@code</span> BiConsumer&#125; is expected</div><div class="line"> * to operate via side-effects.</div><div class="line"> *</div><div class="line"> * &lt;p&gt;This is a &lt;a href="package-summary.html"&gt;functional interface&lt;/a&gt;</div><div class="line"> * whose functional method is &#123;<span class="doctag">@link</span> #accept(Object, Object)&#125;.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> &lt;T&gt; the type of the first argument to the operation</div><div class="line"> * <span class="doctag">@param</span> &lt;U&gt; the type of the second argument to the operation</div><div class="line"> *</div><div class="line"> * <span class="doctag">@see</span> Consumer</div><div class="line"> * <span class="doctag">@since</span> 1.8</div><div class="line"> */</span></div><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BiConsumer</span>&lt;<span class="title">T</span>, <span class="title">U</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * Performs this operation on the given arguments.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> t the first input argument</div><div class="line">     * <span class="doctag">@param</span> u the second input argument</div><div class="line">     */</span></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">accept</span><span class="params">(T t, U u)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="Function接口"><a href="#Function接口" class="headerlink" title="Function接口"></a>Function接口</h1><p>还是顾名思义，该接口就是定义了一个“函数”，输入一个参数，通过该“函数”计算输出一个结果。<br>该接口定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</div><div class="line"> * Represents a function that accepts one argument and produces a result.</div><div class="line"> *</div><div class="line"> * &lt;p&gt;This is a &lt;a href="package-summary.html"&gt;functional interface&lt;/a&gt;</div><div class="line"> * whose functional method is &#123;<span class="doctag">@link</span> #apply(Object)&#125;.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> &lt;T&gt; the type of the input to the function</div><div class="line"> * <span class="doctag">@param</span> &lt;R&gt; the type of the result of the function</div><div class="line"> *</div><div class="line"> * <span class="doctag">@since</span> 1.8</div><div class="line"> */</span></div><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * Applies this function to the given argument.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> t the function argument</div><div class="line">     * <span class="doctag">@return</span> the function result</div><div class="line">     */</span></div><div class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Function&lt;Integer, Integer&gt; function = num -&gt; num + <span class="number">1</span>;</div><div class="line"></div><div class="line">function.apply(<span class="number">1</span>);</div><div class="line"></div><div class="line"><span class="comment">//控制台打印 2</span></div><div class="line">Consumer&lt;Integer&gt; consumer = s -&gt; System.out.println(s);</div><div class="line">consumer.accept(function.apply(<span class="number">1</span>));</div></pre></td></tr></table></figure>
+<h2 id="BiFunction"><a href="#BiFunction" class="headerlink" title="BiFunction"></a>BiFunction</h2><p>该接口与Function接口相比，接收两个参数，返回一个结果，定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</div><div class="line"> * Represents a function that accepts two arguments and produces a result.</div><div class="line"> * This is the two-arity specialization of &#123;<span class="doctag">@link</span> Function&#125;.</div><div class="line"> *</div><div class="line"> * &lt;p&gt;This is a &lt;a href="package-summary.html"&gt;functional interface&lt;/a&gt;</div><div class="line"> * whose functional method is &#123;<span class="doctag">@link</span> #apply(Object, Object)&#125;.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> &lt;T&gt; the type of the first argument to the function</div><div class="line"> * <span class="doctag">@param</span> &lt;U&gt; the type of the second argument to the function</div><div class="line"> * <span class="doctag">@param</span> &lt;R&gt; the type of the result of the function</div><div class="line"> *</div><div class="line"> * <span class="doctag">@see</span> Function</div><div class="line"> * <span class="doctag">@since</span> 1.8</div><div class="line"> */</span></div><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BiFunction</span>&lt;<span class="title">T</span>, <span class="title">U</span>, <span class="title">R</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * Applies this function to the given arguments.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> t the first function argument</div><div class="line">     * <span class="doctag">@param</span> u the second function argument</div><div class="line">     * <span class="doctag">@return</span> the function result</div><div class="line">     */</span></div><div class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t, U u)</span></span>;</div></pre></td></tr></table></figure>
+<h2 id="BinaryOperator"><a href="#BinaryOperator" class="headerlink" title="BinaryOperator"></a>BinaryOperator</h2><p>“二元操作”，我们知道二元操作的两个参数以及返回值都必须是相同类型的，因此这个接口定义的出参和入参相同。该接口继承自BiFunction， 规定两个入参和出参相同，定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</div><div class="line"> * Represents an operation upon two operands of the same type, producing a result</div><div class="line"> * of the same type as the operands.  This is a specialization of</div><div class="line"> * &#123;<span class="doctag">@link</span> BiFunction&#125; for the case where the operands and the result are all of</div><div class="line"> * the same type.</div><div class="line"> *</div><div class="line"> * &lt;p&gt;This is a &lt;a href="package-summary.html"&gt;functional interface&lt;/a&gt;</div><div class="line"> * whose functional method is &#123;<span class="doctag">@link</span> #apply(Object, Object)&#125;.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> &lt;T&gt; the type of the operands and result of the operator</div><div class="line"> *</div><div class="line"> * <span class="doctag">@see</span> BiFunction</div><div class="line"> * <span class="doctag">@see</span> UnaryOperator</div><div class="line"> * <span class="doctag">@since</span> 1.8</div><div class="line"> */</span></div><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BinaryOperator</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">BiFunction</span>&lt;<span class="title">T</span>,<span class="title">T</span>,<span class="title">T</span>&gt; </span>&#123;</div><div class="line">    <span class="comment">/**</div><div class="line">     * Returns a &#123;<span class="doctag">@link</span> BinaryOperator&#125; which returns the lesser of two elements</div><div class="line">     * according to the specified &#123;<span class="doctag">@code</span> Comparator&#125;.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> &lt;T&gt; the type of the input arguments of the comparator</div><div class="line">     * <span class="doctag">@param</span> comparator a &#123;<span class="doctag">@code</span> Comparator&#125; for comparing the two values</div><div class="line">     * <span class="doctag">@return</span> a &#123;<span class="doctag">@code</span> BinaryOperator&#125; which returns the lesser of its operands,</div><div class="line">     *         according to the supplied &#123;<span class="doctag">@code</span> Comparator&#125;</div><div class="line">     * <span class="doctag">@throws</span> NullPointerException if the argument is null</div><div class="line">     */</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">BinaryOperator&lt;T&gt; <span class="title">minBy</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> T&gt; comparator)</span> </span>&#123;</div><div class="line">        Objects.requireNonNull(comparator);</div><div class="line">        <span class="keyword">return</span> (a, b) -&gt; comparator.compare(a, b) &lt;= <span class="number">0</span> ? a : b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * Returns a &#123;<span class="doctag">@link</span> BinaryOperator&#125; which returns the greater of two elements</div><div class="line">     * according to the specified &#123;<span class="doctag">@code</span> Comparator&#125;.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> &lt;T&gt; the type of the input arguments of the comparator</div><div class="line">     * <span class="doctag">@param</span> comparator a &#123;<span class="doctag">@code</span> Comparator&#125; for comparing the two values</div><div class="line">     * <span class="doctag">@return</span> a &#123;<span class="doctag">@code</span> BinaryOperator&#125; which returns the greater of its operands,</div><div class="line">     *         according to the supplied &#123;<span class="doctag">@code</span> Comparator&#125;</div><div class="line">     * <span class="doctag">@throws</span> NullPointerException if the argument is null</div><div class="line">     */</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">BinaryOperator&lt;T&gt; <span class="title">maxBy</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> T&gt; comparator)</span> </span>&#123;</div><div class="line">        Objects.requireNonNull(comparator);</div><div class="line">        <span class="keyword">return</span> (a, b) -&gt; comparator.compare(a, b) &gt;= <span class="number">0</span> ? a : b;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到该接口还额外怎加了两个方法。</p>
+<h1 id="Predicate-接口"><a href="#Predicate-接口" class="headerlink" title="Predicate 接口"></a>Predicate 接口</h1><p>该接口接收一个参数，返回true or false。 定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</div><div class="line"> * Represents a predicate (boolean-valued function) of one argument.</div><div class="line"> *</div><div class="line"> * &lt;p&gt;This is a &lt;a href="package-summary.html"&gt;functional interface&lt;/a&gt;</div><div class="line"> * whose functional method is &#123;<span class="doctag">@link</span> #test(Object)&#125;.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> &lt;T&gt; the type of the input to the predicate</div><div class="line"> *</div><div class="line"> * <span class="doctag">@since</span> 1.8</div><div class="line"> */</span></div><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Predicate</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * Evaluates this predicate on the given argument.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> t the input argument</div><div class="line">     * <span class="doctag">@return</span> &#123;<span class="doctag">@code</span> true&#125; if the input argument matches the predicate,</div><div class="line">     * otherwise &#123;<span class="doctag">@code</span> false&#125;</div><div class="line">     */</span></div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="BiPredicate-接口"><a href="#BiPredicate-接口" class="headerlink" title="BiPredicate 接口"></a>BiPredicate 接口</h2><p>应该可以猜到，该接口接收两个参数，返回true or false. 定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</div><div class="line"> * Represents a predicate (boolean-valued function) of two arguments.  This is</div><div class="line"> * the two-arity specialization of &#123;<span class="doctag">@link</span> Predicate&#125;.</div><div class="line"> *</div><div class="line"> * &lt;p&gt;This is a &lt;a href="package-summary.html"&gt;functional interface&lt;/a&gt;</div><div class="line"> * whose functional method is &#123;<span class="doctag">@link</span> #test(Object, Object)&#125;.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> &lt;T&gt; the type of the first argument to the predicate</div><div class="line"> * <span class="doctag">@param</span> &lt;U&gt; the type of the second argument the predicate</div><div class="line"> *</div><div class="line"> * <span class="doctag">@see</span> Predicate</div><div class="line"> * <span class="doctag">@since</span> 1.8</div><div class="line"> */</span></div><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BiPredicate</span>&lt;<span class="title">T</span>, <span class="title">U</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</div><div class="line">     * Evaluates this predicate on the given arguments.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> t the first input argument</div><div class="line">     * <span class="doctag">@param</span> u the second input argument</div><div class="line">     * <span class="doctag">@return</span> &#123;<span class="doctag">@code</span> true&#125; if the input arguments match the predicate,</div><div class="line">     * otherwise &#123;<span class="doctag">@code</span> false&#125;</div><div class="line">     */</span></div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t, U u)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>总结一下，Supplier不接受任何参数，返回一个值。Consumer 接收一个参数，处理，不返回任何值。Function，接收一个参数，处理，返回一个值。BinaryOperator接收两个参数，处理，返回相同类型的值。Predicate 接收一个参数，返回true or false。 BiSupplier,BiConsumer,BiFunction,BiPredicate 均是在原有基础上多接收一个参数。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/27/Collectors.toMap源码/" rel="next" title="Collectors.toMap解析">
+                <i class="fa fa-chevron-left"></i> Collectors.toMap解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/lufei.jpg"
+               alt="marc" />
+          <p class="site-author-name" itemprop="name">marc</p>
+           
+              <p class="site-description motion-element" itemprop="description">Keep on going</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/amazingmarc" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://tech.meituan.com/" title="美团技术博客" target="_blank">美团技术博客</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#顾名思义"><span class="nav-number">1.</span> <span class="nav-text">顾名思义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Supplier接口"><span class="nav-number">2.</span> <span class="nav-text">Supplier接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Consumer接口"><span class="nav-number">3.</span> <span class="nav-text">Consumer接口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BiConsumer"><span class="nav-number">3.1.</span> <span class="nav-text">BiConsumer</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Function接口"><span class="nav-number">4.</span> <span class="nav-text">Function接口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BiFunction"><span class="nav-number">4.1.</span> <span class="nav-text">BiFunction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BinaryOperator"><span class="nav-number">4.2.</span> <span class="nav-text">BinaryOperator</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Predicate-接口"><span class="nav-number">5.</span> <span class="nav-text">Predicate 接口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BiPredicate-接口"><span class="nav-number">5.1.</span> <span class="nav-text">BiPredicate 接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">marc</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
