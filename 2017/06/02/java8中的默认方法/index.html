@@ -1,0 +1,737 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.useso.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java, Meituan" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="传统上，java程序的接口是将相关方法按照约定组合到一起的方式。实现接口的类必须为接口中定义的每个方法提供一个实现，或者从父类中继承他的实现。但是一旦类库的设计者需要更新接口，向其中加入新的方法，这种方式就会出现问题，现实情况是，现存的实体类王万不再接口设计者的控制范围内。这些实体类为了适配新的接口约定也需要进行修改。java8 为了解决这一个问题引入了一种新的机制，java8 中的接口现在支持在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java8中的默认方法">
+<meta property="og:url" content="http://yoursite.com/2017/06/02/java8中的默认方法/index.html">
+<meta property="og:site_name" content="marc's home">
+<meta property="og:description" content="传统上，java程序的接口是将相关方法按照约定组合到一起的方式。实现接口的类必须为接口中定义的每个方法提供一个实现，或者从父类中继承他的实现。但是一旦类库的设计者需要更新接口，向其中加入新的方法，这种方式就会出现问题，现实情况是，现存的实体类王万不再接口设计者的控制范围内。这些实体类为了适配新的接口约定也需要进行修改。java8 为了解决这一个问题引入了一种新的机制，java8 中的接口现在支持在">
+<meta property="og:updated_time" content="2018-06-02T09:57:37.189Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java8中的默认方法">
+<meta name="twitter:description" content="传统上，java程序的接口是将相关方法按照约定组合到一起的方式。实现接口的类必须为接口中定义的每个方法提供一个实现，或者从父类中继承他的实现。但是一旦类库的设计者需要更新接口，向其中加入新的方法，这种方式就会出现问题，现实情况是，现存的实体类王万不再接口设计者的控制范围内。这些实体类为了适配新的接口约定也需要进行修改。java8 为了解决这一个问题引入了一种新的机制，java8 中的接口现在支持在">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/02/java8中的默认方法/"/>
+
+
+
+
+
+  <title> java8中的默认方法 | marc's home </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">marc's home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/02/java8中的默认方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="marc's home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                java8中的默认方法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-02T17:29:00+08:00">
+                2017-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>传统上，java程序的接口是将相关方法按照约定组合到一起的方式。实现接口的类必须为接口中定义的每个方法提供一个实现，或者从父类中继承他的实现。但是一旦类库的设计者需要更新接口，向其中加入新的方法，这种方式就会出现问题，现实情况是，现存的实体类王万不再接口设计者的控制范围内。这些实体类为了适配新的接口约定也需要进行修改。java8 为了解决这一个问题引入了一种新的机制，java8 中的接口现在支持在声明方法的同时提供实现。即默认方法，通过默认方法你可以指定接口的默认实现。因此实现接口的类如果不显示提供该方法的具体实现，就会自动继承默认的实现。这种机制可以使你平滑的进行接口的优化和演进。这篇文章我们了解一下java8中提供的默认方法。<br><a id="more"></a></p>
+<h1 id="默认方法概述"><a href="#默认方法概述" class="headerlink" title="默认方法概述"></a>默认方法概述</h1><p>我们都知道java8中引入stream来对数据进行处理，集合类型中都有存在一个stream()方法，该方法就是在Collection接口中定义的默认方法，该方法的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">default</span> Stream&lt;E&gt; <span class="title">stream</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> StreamSupport.stream(spliterator(), <span class="keyword">false</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到默认方法是以 “default” 来修饰的。这个方法里面使用StreamSupport.stream 这个静态方法返回一个流。而传递的参数 spliterator() 方法也是Collection中的默认方法。<br>现在看起来引入默认方法之后接口很像抽象类了，他们都能包含抽象方法和包含方法体的实现。不过他们还是有如下区别：</p>
+<ol>
+<li>首先，一个类只能继承一个抽象类，但是一个类可以实现多个接口。</li>
+<li>其次，一个抽象类可以通过实例变量保存一个通用的状态，而接口不能有实例变量。</li>
+</ol>
+<h1 id="默认方法的使用模式"><a href="#默认方法的使用模式" class="headerlink" title="默认方法的使用模式"></a>默认方法的使用模式</h1><p>默认方法对于类库设计者来说非常有用，可以使用默认函数演进库函数。同时，我们也可以创建自己的接口并为其提供默认方法。接下来我们会介绍使用默认方法的两种用例，<em>可选方法</em> 和 <em>行为的多继承</em>。</p>
+<h2 id="可选方法"><a href="#可选方法" class="headerlink" title="可选方法"></a>可选方法</h2><p>我们会经常遇到这种情况，类实现了接口，不过却刻意的将一些方法的实现留白。我们以Iterator接口为例来说。Iterator接口定义了hasNext、next 还定义了 remove方法。java8之前由于用户通常不会是用该方法，remove方法经常被忽略。因此实现Iterator的类，通常会为remove方法放置一个空实现，这些都是毫无用处的模板代码。<br>采用默认方法之后，你可以为这种类型的方法提供一个默认的实现，这样实体类就无需在自己的实现中显示提供一个控方法。比如在java8中，Iterator接口就为remove方法提供了一个默认实现 如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> UnsupportedOperationException(<span class="string">"remove"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通过这种方式，你可以减少无效的模板方法，实现Iterator接口的每个类都不需要再声明一个空的remove方法了。因为他已经有一个默认的实现。</p>
+<h2 id="行为的多继承"><a href="#行为的多继承" class="headerlink" title="行为的多继承"></a>行为的多继承</h2><p>假如你是一个java绘图库的设计者，你需要定义多个具有不同特质的形状。有的形状需要调整大小，但是不需要旋转功能，有的需要旋转和移动，但是不需要调整大小，这种情况下，你怎样设计才能尽可能重用代码呢？<br>你可以定义一个单独的Rotatable接口，并提供两个抽象方法 setRotatinAngle 和 getRotationAngle 如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Rotatable</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setRotationAngle</span><span class="params">(<span class="keyword">int</span> degree)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getRotationAngle</span><span class="params">()</span></span>;</div><div class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">rotateBy</span><span class="params">(<span class="keyword">int</span> angleInDegrees)</span></span>&#123;</div><div class="line">        setRotationAngle((getRotationAngle() + angleInDegrees) % <span class="number">360</span> );</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这种方式和模板设计模式有些相似，都是以其他方法需要实现的方法定义好框架算法。现在实现Rotatable的所有实现类需要提供setRotationAngle和getRotationAngle的实现，但与此同时他们会天然的继承rotateBy的实现。<br>类似的，你可以定义Moveable和Resizable。他们都包含了默认实现，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Moveable</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getX</span><span class="params">()</span></span>;</div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getY</span><span class="params">()</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setX</span><span class="params">(<span class="keyword">int</span> x)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setY</span><span class="params">(<span class="keyword">int</span> y)</span></span>;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">moveHorzontally</span><span class="params">(<span class="keyword">int</span> distance)</span></span>&#123;</div><div class="line">        setX(getX() + distance);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">moveVertically</span> <span class="params">(<span class="keyword">int</span> distance)</span></span>&#123;</div><div class="line">        setY(getY() + distance);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Resizable</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getWidth</span><span class="params">()</span></span>;</div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getHeight</span><span class="params">()</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setWidth</span><span class="params">(<span class="keyword">int</span> width)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setHeight</span><span class="params">(<span class="keyword">int</span> height)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setAbsoluteSize</span><span class="params">(<span class="keyword">int</span> width, <span class="keyword">int</span> height)</span></span>;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">setRelativeSize</span><span class="params">(<span class="keyword">int</span> wFactor, <span class="keyword">int</span> hFactor)</span></span>&#123;</div><div class="line">        setAbsoluteSize(getWidth() / wFactor, getHeight() / hFactor);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>接下来，通过组合这些接口，就可以创建拥有不同行为的实体类，比如Monster类可以移动、旋转和缩放。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Monster</span> <span class="keyword">implements</span> <span class="title">Moveable</span>, <span class="title">Resizable</span>, <span class="title">Rotatable</span> </span>&#123;</div><div class="line">	这里需要不需要重复实现默认方法</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样 Monster就直接继承了三个接口中的默认方法。当然你还可以通过其他不同的接口组合创建其他的类。</p>
+<h1 id="解决冲突"><a href="#解决冲突" class="headerlink" title="解决冲突"></a>解决冲突</h1><p>我们都知道java中一个类只能继承一个父类，但是可以实现多个接口。但随着默认方法的引入，可能会出现一个类继承了多个方法而他们使用的函数签名是相同的。这种情况下类会使用哪一个方法？java8 中提供了一套规则来判定如何解决这种冲突。</p>
+<p>如果一个类从多个地方地方继承了一个具有相同函数签名的方法，通过以下三条规则可以进行判断：</p>
+<ol>
+<li>类中的方法优先级最高，类和父类中声明的方法的优先级高于任何声明为默认方法的优先级。</li>
+<li>如果无法通过第一条进行判定，那么子接口的优先级更高：函数签名相同的情况下优先选择拥有最具体实现的默认方法的接口。即如果B接口继承了A接口，那么B就比A更加具体。</li>
+<li>如果还是无法判断，继承了多个接口的类必须通过显式覆盖和调用期望的方法，显式的选择使用哪一个默认方法的实现。</li>
+</ol>
+<p>下面来看一些具体的例子，来加深对这3条规则的理解。</p>
+<p>首先我们定义如下接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">A</span> </span>&#123;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span></span>&#123;</div><div class="line">        System.out.println(<span class="string">"hello A"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">B</span> <span class="keyword">extends</span> <span class="title">A</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span></span>&#123;</div><div class="line">        System.out.println(<span class="string">"hello B"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="选择最具体的实现"><a href="#选择最具体的实现" class="headerlink" title="选择最具体的实现"></a>选择最具体的实现</h2><p>如果我们创建一个类 C 实现 A ，B 两个接口,如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">C</span> <span class="keyword">implements</span> <span class="title">A</span>, <span class="title">B</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span></span>&#123;</div><div class="line">        <span class="keyword">new</span> C().hello();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>根据规则2 应该选择提供了最具体实现的默认方法的接口，由于B继承了A，所以B比A 更加具体，所以会选择B接口中的默认方法。</p>
+<p>现在，我们看看如果C像下面这样继承自D会发生什么：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">D</span> <span class="keyword">implements</span> <span class="title">A</span> </span>&#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">C</span> <span class="keyword">extends</span> <span class="title">D</span> <span class="keyword">implements</span> <span class="title">B</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span></span>&#123;</div><div class="line">        <span class="keyword">new</span> C().hello();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>D实现了接口A。所以他拥有了A的默认方法。 根据规则1 类中声明的方法具有更高的优先级，但是D并未覆盖hello方法。所以根据规则2 如果父类中没有对应的方法，那么就应该选择提供了最具体实现接口的方法，因此，编译器会在接口A和接口B中为C选择默认方法，当然会选择B接口中的默认方法。</p>
+<h2 id="冲突以及如何显示的消除歧义"><a href="#冲突以及如何显示的消除歧义" class="headerlink" title="冲突以及如何显示的消除歧义"></a>冲突以及如何显示的消除歧义</h2><p>到目前为止，我们都可以通过规则解决冲突，如果B接口不再继承A，如下所示</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">B</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span></span>&#123;</div><div class="line">        System.out.println(<span class="string">"hello B"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">A</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span></span>&#123;</div><div class="line">        System.out.println(<span class="string">"hello A"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">C</span> <span class="keyword">implements</span> <span class="title">B</span>,<span class="title">A</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span></span>&#123;</div><div class="line">        <span class="keyword">new</span> C().hello();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样，没有哪一个接口的实现更加具体，两个都是一样的，因此编译会报错，这时你只能显示的决定使用哪个接口中的默认方法。为了达到这个目的，你可以在C类中重写hello 方法，在它的方法体内显示的调用你希望调用的方法。java8 中引入了一种新的语法 X.super.m()。 其中X是你希望调用的m方法所在的父接口。比如你想使用来自B接口的默认方法，那么代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">C</span></div><div class="line">        <span class="keyword">implements</span> <span class="title">B</span>,<span class="title">A</span> </span>&#123;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span></span>&#123;</div><div class="line">        <span class="keyword">new</span> C().hello();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span> </span>&#123;</div><div class="line">        B.<span class="keyword">super</span>.hello();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>总之，一个类的默认方法使用相同的函数签名来自多个接口，只要使用上面的三条规则就能解决所有的冲突。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/27/java8的几个主要函数接口/" rel="next" title="java8的几个主要函数接口">
+                <i class="fa fa-chevron-left"></i> java8的几个主要函数接口
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/lufei.jpg"
+               alt="marc" />
+          <p class="site-author-name" itemprop="name">marc</p>
+           
+              <p class="site-description motion-element" itemprop="description">Keep on going</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/amazingmarc" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://tech.meituan.com/" title="美团技术博客" target="_blank">美团技术博客</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#默认方法概述"><span class="nav-number">1.</span> <span class="nav-text">默认方法概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#默认方法的使用模式"><span class="nav-number">2.</span> <span class="nav-text">默认方法的使用模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#可选方法"><span class="nav-number">2.1.</span> <span class="nav-text">可选方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#行为的多继承"><span class="nav-number">2.2.</span> <span class="nav-text">行为的多继承</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决冲突"><span class="nav-number">3.</span> <span class="nav-text">解决冲突</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#选择最具体的实现"><span class="nav-number">3.1.</span> <span class="nav-text">选择最具体的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#冲突以及如何显示的消除歧义"><span class="nav-number">3.2.</span> <span class="nav-text">冲突以及如何显示的消除歧义</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">marc</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
