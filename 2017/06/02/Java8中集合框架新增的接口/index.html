@@ -87,30 +87,27 @@
 
 
 
-<meta name="description" content="#前言
-我们先从最熟悉的Java集合框架(Java Collections Framework, JCF)开始说起。
+<meta name="description" content="前言我们先从最熟悉的Java集合框架(Java Collections Framework, JCF)开始说起。
 为引入Lambda表达式，Java8新增了java.util.funcion包，里面包含常用的函数接口，这是Lambda表达式的基础，Java集合框架也新增部分接口，以便与Lambda表达式对接。
 首先回顾一下Java集合框架的接口继承结构：
-上图中绿色标注的接口类，表示在Java">
+上图中绿色标注的接口类，表示在Java8中">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java8中集合框架新增的接口">
 <meta property="og:url" content="http://yoursite.com/2017/06/02/Java8中集合框架新增的接口/index.html">
 <meta property="og:site_name" content="marc's home">
-<meta property="og:description" content="#前言
-我们先从最熟悉的Java集合框架(Java Collections Framework, JCF)开始说起。
+<meta property="og:description" content="前言我们先从最熟悉的Java集合框架(Java Collections Framework, JCF)开始说起。
 为引入Lambda表达式，Java8新增了java.util.funcion包，里面包含常用的函数接口，这是Lambda表达式的基础，Java集合框架也新增部分接口，以便与Lambda表达式对接。
 首先回顾一下Java集合框架的接口继承结构：
-上图中绿色标注的接口类，表示在Java">
+上图中绿色标注的接口类，表示在Java8中">
 <meta property="og:image" content="http://yoursite.com/upload/collection.png">
 <meta property="og:image" content="http://yoursite.com/upload/newmethod.png">
-<meta property="og:updated_time" content="2018-06-02T11:29:41.348Z">
+<meta property="og:updated_time" content="2018-06-02T11:38:49.772Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java8中集合框架新增的接口">
-<meta name="twitter:description" content="#前言
-我们先从最熟悉的Java集合框架(Java Collections Framework, JCF)开始说起。
+<meta name="twitter:description" content="前言我们先从最熟悉的Java集合框架(Java Collections Framework, JCF)开始说起。
 为引入Lambda表达式，Java8新增了java.util.funcion包，里面包含常用的函数接口，这是Lambda表达式的基础，Java集合框架也新增部分接口，以便与Lambda表达式对接。
 首先回顾一下Java集合框架的接口继承结构：
-上图中绿色标注的接口类，表示在Java">
+上图中绿色标注的接口类，表示在Java8中">
 <meta name="twitter:image" content="http://yoursite.com/upload/collection.png">
 
 
@@ -358,19 +355,18 @@
       
 
       
-        <p>#前言</p>
-<p>我们先从最熟悉的<em>Java集合框架(Java Collections Framework, JCF)</em>开始说起。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>我们先从最熟悉的<em>Java集合框架(Java Collections Framework, JCF)</em>开始说起。</p>
 <p>为引入Lambda表达式，Java8新增了java.util.funcion包，里面包含常用的函数接口，这是Lambda表达式的基础，Java集合框架也新增部分接口，以便与Lambda表达式对接。</p>
 <p>首先回顾一下Java集合框架的接口继承结构：<br><img src="/upload/collection.png" alt="avatar"></p>
 <p>上图中绿色标注的接口类，表示在Java8中加入了新的接口方法，当然由于继承关系，他们相应的子类也都会继承这些新方法。下表详细列举了这些方法。</p>
 <p><img src="/upload/newmethod.png" alt="avatar"><br>这些新加入的方法大部分要用到java.util.function包下的接口，这意味着这些方法大部分都跟Lambda表达式相关。我们将逐一学习这些方法。</p>
-<a id="more"></a>
+<p>建议先看一下 <a href="/2017/06/02/java8中的默认方法/" title="java8中的默认方法">java8中的默认方法</a> 和 <a href="/2017/05/27/java8的几个主要函数接口/" title="java8的几个主要函数接口">java8的几个主要函数接口</a><br><a id="more"></a></p>
 <h1 id="Collection中的新方法"><a href="#Collection中的新方法" class="headerlink" title="Collection中的新方法"></a>Collection中的新方法</h1><h2 id="forEach"><a href="#forEach" class="headerlink" title="forEach()"></a>forEach()</h2><p>该方法定义在Iterator接口中。定义如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">forEach</span><span class="params">(Consumer&lt;? <span class="keyword">super</span> T&gt; action)</span> </span>&#123;</div><div class="line">    Objects.requireNonNull(action);</div><div class="line">    <span class="keyword">for</span> (T t : <span class="keyword">this</span>) &#123;</div><div class="line">        action.accept(t);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>可以看到这是一个默认方法，会遍历列表，对列表中的每个元素应用action指定的动作。其实就是把遍历动作放到了内部。</p>
 <p>需求：假设有一个字符串列表，需要打印出其中所有长度大于3的字符串.<br>之前我们会这样写代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//外部循环遍历</span></div><div class="line">ArrayList&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;(Arrays.asList(<span class="string">"I"</span>, <span class="string">"love"</span>, <span class="string">"you"</span>, <span class="string">"too"</span>));</div><div class="line"><span class="keyword">for</span>(String str : list)&#123;</div><div class="line">    <span class="keyword">if</span>(str.length()&gt;<span class="number">3</span>)</div><div class="line">        System.out.println(str);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>现在使用forEach()方法结合匿名内部类，可以这样实现：</p>
+<p>现在使用forEach()方法结合lamada表达式，可以这样实现：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 使用forEach()结合Lambda表达式迭代</span></div><div class="line">ArrayList&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;(Arrays.asList(<span class="string">"I"</span>, <span class="string">"love"</span>, <span class="string">"you"</span>, <span class="string">"too"</span>));</div><div class="line">list.forEach( str -&gt; &#123;</div><div class="line">        <span class="keyword">if</span>(str.length()&gt;<span class="number">3</span>)</div><div class="line">            System.out.println(str);</div><div class="line">    &#125;);</div></pre></td></tr></table></figure>
 <h2 id="removeIf"><a href="#removeIf" class="headerlink" title="removeIf()"></a>removeIf()</h2><p>该接口定义在Collection接口中，定义如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">default</span> <span class="keyword">boolean</span> <span class="title">removeIf</span><span class="params">(Predicate&lt;? <span class="keyword">super</span> E&gt; filter)</span> </span>&#123;</div><div class="line">     Objects.requireNonNull(filter);</div><div class="line">     <span class="keyword">boolean</span> removed = <span class="keyword">false</span>;</div><div class="line">     <span class="keyword">final</span> Iterator&lt;E&gt; each = iterator();</div><div class="line">     <span class="keyword">while</span> (each.hasNext()) &#123;</div><div class="line">         <span class="keyword">if</span> (filter.test(each.next())) &#123;</div><div class="line">             each.remove();</div><div class="line">             removed = <span class="keyword">true</span>;</div><div class="line">         &#125;</div><div class="line">     &#125;</div><div class="line">     <span class="keyword">return</span> removed;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
@@ -645,7 +641,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Collection中的新方法"><span class="nav-number">1.</span> <span class="nav-text">Collection中的新方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#forEach"><span class="nav-number">1.1.</span> <span class="nav-text">forEach()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#removeIf"><span class="nav-number">1.2.</span> <span class="nav-text">removeIf()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#replaceAll"><span class="nav-number">1.3.</span> <span class="nav-text">replaceAll()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sort"><span class="nav-number">1.4.</span> <span class="nav-text">sort()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spliterator"><span class="nav-number">1.5.</span> <span class="nav-text">spliterator()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stream-和parallelStream"><span class="nav-number">1.6.</span> <span class="nav-text">stream()和parallelStream()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Map中的新方法"><span class="nav-number">2.</span> <span class="nav-text">Map中的新方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#forEach-1"><span class="nav-number">2.1.</span> <span class="nav-text">forEach()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#getOrDefault"><span class="nav-number">2.2.</span> <span class="nav-text">getOrDefault()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#putIfAbsent"><span class="nav-number">2.3.</span> <span class="nav-text">putIfAbsent()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#remove"><span class="nav-number">2.4.</span> <span class="nav-text">remove()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#replace"><span class="nav-number">2.5.</span> <span class="nav-text">replace()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#replaceAll-1"><span class="nav-number">2.6.</span> <span class="nav-text">replaceAll()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#merge"><span class="nav-number">2.7.</span> <span class="nav-text">merge()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compute"><span class="nav-number">2.8.</span> <span class="nav-text">compute()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#computeIfAbsent"><span class="nav-number">2.9.</span> <span class="nav-text">computeIfAbsent()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#computeIfPresent"><span class="nav-number">2.10.</span> <span class="nav-text">computeIfPresent()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Collection中的新方法"><span class="nav-number">2.</span> <span class="nav-text">Collection中的新方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#forEach"><span class="nav-number">2.1.</span> <span class="nav-text">forEach()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#removeIf"><span class="nav-number">2.2.</span> <span class="nav-text">removeIf()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#replaceAll"><span class="nav-number">2.3.</span> <span class="nav-text">replaceAll()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sort"><span class="nav-number">2.4.</span> <span class="nav-text">sort()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spliterator"><span class="nav-number">2.5.</span> <span class="nav-text">spliterator()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stream-和parallelStream"><span class="nav-number">2.6.</span> <span class="nav-text">stream()和parallelStream()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Map中的新方法"><span class="nav-number">3.</span> <span class="nav-text">Map中的新方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#forEach-1"><span class="nav-number">3.1.</span> <span class="nav-text">forEach()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#getOrDefault"><span class="nav-number">3.2.</span> <span class="nav-text">getOrDefault()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#putIfAbsent"><span class="nav-number">3.3.</span> <span class="nav-text">putIfAbsent()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#remove"><span class="nav-number">3.4.</span> <span class="nav-text">remove()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#replace"><span class="nav-number">3.5.</span> <span class="nav-text">replace()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#replaceAll-1"><span class="nav-number">3.6.</span> <span class="nav-text">replaceAll()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#merge"><span class="nav-number">3.7.</span> <span class="nav-text">merge()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compute"><span class="nav-number">3.8.</span> <span class="nav-text">compute()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#computeIfAbsent"><span class="nav-number">3.9.</span> <span class="nav-text">computeIfAbsent()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#computeIfPresent"><span class="nav-number">3.10.</span> <span class="nav-text">computeIfPresent()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
