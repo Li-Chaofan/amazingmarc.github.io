@@ -1,0 +1,780 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.useso.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java, Meituan" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="概述我们平时是以记录为单位来向表中插入数据的，这些记录在磁盘上的存放方式也被称为行格式或者记录格式。设计InnoDB存储引擎目前支持4种不同类型的行格式，分别是Compact、Redundant、Dynamic和Compressed行格式。而在MySQL5.1之后默认的行格式都是Compact，因此本文主要介绍Compact行格式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="innodb记录存储结构">
+<meta property="og:url" content="http://yoursite.com/2017/07/11/innodb记录存储结构/index.html">
+<meta property="og:site_name" content="marc's home">
+<meta property="og:description" content="概述我们平时是以记录为单位来向表中插入数据的，这些记录在磁盘上的存放方式也被称为行格式或者记录格式。设计InnoDB存储引擎目前支持4种不同类型的行格式，分别是Compact、Redundant、Dynamic和Compressed行格式。而在MySQL5.1之后默认的行格式都是Compact，因此本文主要介绍Compact行格式。">
+<meta property="og:image" content="http://yoursite.com/upload/compact_record.png">
+<meta property="og:updated_time" content="2018-07-10T16:38:19.114Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="innodb记录存储结构">
+<meta name="twitter:description" content="概述我们平时是以记录为单位来向表中插入数据的，这些记录在磁盘上的存放方式也被称为行格式或者记录格式。设计InnoDB存储引擎目前支持4种不同类型的行格式，分别是Compact、Redundant、Dynamic和Compressed行格式。而在MySQL5.1之后默认的行格式都是Compact，因此本文主要介绍Compact行格式。">
+<meta name="twitter:image" content="http://yoursite.com/upload/compact_record.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/07/11/innodb记录存储结构/"/>
+
+
+
+
+
+  <title> innodb记录存储结构 | marc's home </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">marc's home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/11/innodb记录存储结构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="marc's home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                innodb记录存储结构
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-11T00:25:00+08:00">
+                2017-07-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>我们平时是以记录为单位来向表中插入数据的，这些记录在磁盘上的存放方式也被称为行格式或者记录格式。设计InnoDB存储引擎目前支持4种不同类型的行格式，分别是Compact、Redundant、Dynamic和Compressed行格式。而在MySQL5.1之后默认的行格式都是Compact，因此本文主要介绍Compact行格式。</p>
+<a id="more"></a>
+<p>表的行格式可以通过 ROW_FORMAT 来进行设置，如下表设置行格式为 COMPACT<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mysql&gt; CREATE TABLE record_format_demo (</div><div class="line">    -&gt;     c1 VARCHAR(10),</div><div class="line">    -&gt;     c2 VARCHAR(10) NOT NULL,</div><div class="line">    -&gt;     c3 CHAR(10),</div><div class="line">    -&gt;     c4 VARCHAR(10)</div><div class="line">    -&gt; ) CHARSET=ascii ROW_FORMAT=COMPACT;</div><div class="line">Query OK, 0 rows affected (0.08 sec)</div></pre></td></tr></table></figure></p>
+<p>随便向表里面插入几条数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> record_format_demo(c1, c2, c3, c4) <span class="keyword">VALUES</span>(<span class="string">'aaaa'</span>, <span class="string">'bbb'</span>, <span class="string">'cc'</span>, <span class="string">'d'</span>), (<span class="string">'eeee'</span>, <span class="string">'fff'</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</div></pre></td></tr></table></figure>
+<p>表中的数据如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">mysql&gt; select * from record_format_demo;</div><div class="line">+------+-----+------+------+</div><div class="line">| c1   | c2  | c3   | c4   |</div><div class="line">+------+-----+------+------+</div><div class="line">| aaaa | bbb | cc   | d    |</div><div class="line">| eeee | fff | NULL | NULL |</div><div class="line">+------+-----+------+------+</div><div class="line">2 rows in set (0.00 sec)</div></pre></td></tr></table></figure>
+<h1 id="Compact行记录格式"><a href="#Compact行记录格式" class="headerlink" title="Compact行记录格式"></a>Compact行记录格式</h1><p>Compact行记录是在MySQL5.0中引入的，其设计目标是高效的存储数据。简单来说，一个页中存放的行数越多，其性能就越高，下图显示了Compact行记录的存储方式：<br><img src="/upload/compact_record.png" alt="avatar"></p>
+<h2 id="变长字段长度"><a href="#变长字段长度" class="headerlink" title="变长字段长度"></a>变长字段长度</h2><p>从上图可以看出，Compact行记录格式的首部是一个 <strong>非NULL</strong>变长字段长度列表，并且其是按照列的顺序 <strong>逆序</strong>放置的。<br>MySQL支持一些变长的数据类型，比如VARCHAR(M)、VARBINARY(M)、各种TEXT类型，各种BLOB类型，这些变长的数据类型占用的存储空间分为两部分：</p>
+<ul>
+<li>真正的数据内容</li>
+<li>占用的字节数</li>
+</ul>
+<p>因为如果不保存真实数据占用的字节数的话，MySQL服务器也不知道我们存储的数据究竟有多长。在Compact行格式中，把所有变长类型的列的长度都存放在记录的开头部位形成一个列表，按照列的顺序逆序存放，我们再次强调一遍，是逆序存放！我们拿record_format_demo表中的第一条记录来举个例子。因为record_format_demo表的c1、c2、c4列都是VARCHAR(10)类型的，也就是变长的数据类型，所以这三个列的值的长度都需要保存在记录开头处，因为record_format_demo表中的各个列都使用的是ascii字符集，所以每个字符只需要1个字节来进行编码，来看一下第一条记录各列内容的长度</p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th style="text-align:center">存储内容</th>
+<th style="text-align:right">内容长度（十进制）</th>
+<th style="text-align:right">内容长度（十六进制）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c1</td>
+<td style="text-align:center">‘aaaa’</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0x04</td>
+</tr>
+<tr>
+<td>c2</td>
+<td style="text-align:center">‘bbb’</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">0x03</td>
+</tr>
+<tr>
+<td>c4</td>
+<td style="text-align:center">‘d’</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">0x01</td>
+</tr>
+</tbody>
+</table>
+<p>又因为这些长度值需要按照列的逆序存放，所以最后变长字段长度列表的字节串用十六进制表示的效果就是（各个字节之间实际上没有空格，用空格隔开只是方便理解）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">01 03 04</div></pre></td></tr></table></figure>
+<p>由于第一行记录中c1、c2、c4列中的字符串都比较短，也就是说内容占用的字节数比较小，用1个字节就可以表示，但是如果变长列的内容占用的字节数比较多，可能就需要用2个字节来表示。具体用1个还是2个字节来表示真实数据占用的字节数，MySQL有它的一套规则，因为用汉字描述很长的概念很容易变得啰嗦从而让人迷惑，所以我们用公式来表示一下，首先声明一下W、M和L的意思：</p>
+<p>假设某个字符集中表示一个字符最多需要使用的字节数为W，也就是使用SHOW CHARSET语句的结果中的Maxlen列，比方说utf8字符集中的W就是3，gbk字符集中的W就是2，ascii字符集中的W就是1。</p>
+<p>对于变长类型VARCHAR(M)来说，这种类型表示能存储最多M个字符，所以这个类型能表示的字符串最多占用的字节数就是M×W，</p>
+<p>假设它存储的字符串占用的字节数是L。</p>
+<p>所以确定使用1个字节还是2个字节表示真正字符串占用的字节数的规则就是这样：</p>
+<ul>
+<li><p>如果M×W &lt; 256，那么使用1个字节来表示真正字符串占用的字节数。</p>
+</li>
+<li><p>如果M×W &gt;= 256，则分为两种情况：</p>
+<ul>
+<li><p>如果L &lt; 128，则用1个字节来表示真正字符串占用的字节数</p>
+</li>
+<li><p>如果L &gt;= 128，则用2个字节来表示真正字符串占用的字节数</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>需要注意的一点是，变长字段长度列表中只存储值为 非NULL 的列内容占用的长度，值为 NULL 的列的长度是不储存的 。也就是说对于第二条记录来说，因为c4列的值为NULL，所以变长字段长度列表只需要存储c1和c2列的长度即可。其中c1列存储的值为’eeee’，占用的字节数为4，c2列存储的值为’fff’，占用的字节数为3，所以变长字段长度列表需2个字节</p>
+<p>MySQL官方文档中对这部分的描述如下：</p>
+<blockquote>
+<p>The variable-length part of the header also contains the lengths of variable-length columns. Each length takes one or two bytes, depending on the maximum length of the column. If all columns in the index are NOT NULL and have a fixed length, the record header has no variable-length part.For each non-NULL variable-length field, the record header contains the length of the column in one or two bytes. Two bytes are only needed if part of the column is stored externally in overflow pages or the maximum length exceeds 255 bytes and the actual length exceeds 127 bytes. For an externally stored column, the 2-byte length indicates the length of the internally stored part plus the 20-byte pointer to the externally stored part. The internal part is 768 bytes, so the length is 768+20. The 20-byte pointer stores the true length of the column.</p>
+</blockquote>
+<h2 id="NULL值列表"><a href="#NULL值列表" class="headerlink" title="NULL值列表"></a>NULL值列表</h2><p>我们知道表中的某些列可能存储NULL值，如果把这些NULL值都放到记录的真实数据中存储会很占地方，所以Compact行格式把这些值为NULL的列统一管理起来，存储到NULL值列表中，它的处理过程是这样的：</p>
+<ol>
+<li><p>首先统计表中允许存储NULL的列有哪些。我们前边说过，主键列、被NOT NULL修饰的列都是不可以存储NULL值的，所以在统计的时候不会把这些列算进去。比方说表record_format_demo的3个列c1、c3、c4都是允许存储NULL值的，而c2列是被NOT NULL修饰，不允许存储NULL值。</p>
+</li>
+<li><p>如果表中没有允许存储 NULL 的列，则 NULL值列表 也不存在了，否则将每个允许存储NULL的列对应一个二进制位，二进制位按照列的顺序逆序排列，二进制位的值为1时，代表该列的值为NULL否则表示该值不为NULL：</p>
+</li>
+</ol>
+<p>如果NULL值的列数为N 那么NUll值列表所占用的字节数为 CEILING(N/8)；</p>
+<p>MySQL官方文档中对NULL值列表描述如下：</p>
+<blockquote>
+<p>The variable-length part of the record header contains a bit vector for indicating NULL columns. If the number of columns in the index that can be NULL is N, the bit vector occupies CEILING(N/8) bytes. (For example, if there are anywhere from 9 to 16 columns that can be NULL, the bit vector uses two bytes.) </p>
+</blockquote>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>mySQL官方文档： <a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-physical-record.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.7/en/innodb-physical-record.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/02/Java8中集合框架新增的接口/" rel="next" title="Java8中集合框架新增的接口">
+                <i class="fa fa-chevron-left"></i> Java8中集合框架新增的接口
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/lufei.jpg"
+               alt="marc" />
+          <p class="site-author-name" itemprop="name">marc</p>
+           
+              <p class="site-description motion-element" itemprop="description">Keep on going</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/amazingmarc" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://tech.meituan.com/" title="美团技术博客" target="_blank">美团技术博客</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Compact行记录格式"><span class="nav-number">2.</span> <span class="nav-text">Compact行记录格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#变长字段长度"><span class="nav-number">2.1.</span> <span class="nav-text">变长字段长度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NULL值列表"><span class="nav-number">2.2.</span> <span class="nav-text">NULL值列表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">marc</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
