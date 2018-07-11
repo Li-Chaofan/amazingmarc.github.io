@@ -94,7 +94,10 @@
 <meta property="og:site_name" content="marc's home">
 <meta property="og:description" content="概述我们平时是以记录为单位来向表中插入数据的，这些记录在磁盘上的存放方式也被称为行格式或者记录格式。设计InnoDB存储引擎目前支持4种不同类型的行格式，分别是Compact、Redundant、Dynamic和Compressed行格式。而在MySQL5.1之后默认的行格式都是Compact，因此本文主要介绍Compact行格式。">
 <meta property="og:image" content="http://yoursite.com/upload/compact_record.png">
-<meta property="og:updated_time" content="2018-07-10T16:38:19.114Z">
+<meta property="og:image" content="http://yoursite.com/upload/compact_row_real.png">
+<meta property="og:image" content="http://yoursite.com/upload/row_overflow.png">
+<meta property="og:image" content="http://yoursite.com/upload/char_mutil_byte.png">
+<meta property="og:updated_time" content="2018-07-11T16:50:42.940Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="innodb记录存储结构">
 <meta name="twitter:description" content="概述我们平时是以记录为单位来向表中插入数据的，这些记录在磁盘上的存放方式也被称为行格式或者记录格式。设计InnoDB存储引擎目前支持4种不同类型的行格式，分别是Compact、Redundant、Dynamic和Compressed行格式。而在MySQL5.1之后默认的行格式都是Compact，因此本文主要介绍Compact行格式。">
@@ -310,8 +313,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
                   </a>
                 </span>
 
@@ -425,7 +428,155 @@
 <blockquote>
 <p>The variable-length part of the record header contains a bit vector for indicating NULL columns. If the number of columns in the index that can be NULL is N, the bit vector occupies CEILING(N/8) bytes. (For example, if there are anywhere from 9 to 16 columns that can be NULL, the bit vector uses two bytes.) </p>
 </blockquote>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>mySQL官方文档： <a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-physical-record.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.7/en/innodb-physical-record.html</a></p>
+<h2 id="记录头信息"><a href="#记录头信息" class="headerlink" title="记录头信息"></a>记录头信息</h2><p>记录头（record header）固定占用5个字节（40bit）,每位描述如下：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th style="text-align:center">大小（bit）</th>
+<th style="text-align:right">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>()</td>
+<td style="text-align:center">1</td>
+<td style="text-align:right">没有使用</td>
+</tr>
+<tr>
+<td>()</td>
+<td style="text-align:center">1</td>
+<td style="text-align:right">没有使用</td>
+</tr>
+<tr>
+<td>delete_flag</td>
+<td style="text-align:center">1</td>
+<td style="text-align:right">改行是否已被删除</td>
+</tr>
+<tr>
+<td>min_rec_flag</td>
+<td style="text-align:center">1</td>
+<td style="text-align:right">为1表示该记录是预先被定义的最小的记录</td>
+</tr>
+<tr>
+<td>n_owned</td>
+<td style="text-align:center">4</td>
+<td style="text-align:right">表示该记录所在槽所拥有的记录数</td>
+</tr>
+<tr>
+<td>heap_no</td>
+<td style="text-align:center">13</td>
+<td style="text-align:right">表示当前记录在记录堆的位置信息</td>
+</tr>
+<tr>
+<td>record_type</td>
+<td style="text-align:center">3</td>
+<td style="text-align:right">表示当前记录的类型，0表示普通记录，1表示B+树非叶节点记录，2表示最小记录，3表示最大记录</td>
+</tr>
+<tr>
+<td>next_record</td>
+<td style="text-align:center">16</td>
+<td style="text-align:right">页中下一个记录的相对位置</td>
+</tr>
+</tbody>
+</table>
+<p>疑问：heap_no的作用？</p>
+<h2 id="记录的真实数据"><a href="#记录的真实数据" class="headerlink" title="记录的真实数据"></a>记录的真实数据</h2><p>记录头后边就是用户实际存储的每个列的数据。需要特别注意的是,null 不占用该部分任何空间。即NULL除了占用NULL标志位，实际存储不占用任何空间。另外还有一点需要注意的是，每行数据除了用户定义的列外，还会有两个隐藏列，<strong>事务ID列</strong>和<strong>回滚指针列</strong>分别为6个字节和7个字节。如果表中没有定义主键，每行还会增加一个6字节的rowid列。如下表：</p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th style="text-align:center">是否必须</th>
+<th style="text-align:right">占用空间</th>
+<th style="text-align:right">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>row_id</td>
+<td style="text-align:center">否</td>
+<td style="text-align:right">6字节</td>
+<td style="text-align:right">行ID，唯一标识一条记录</td>
+</tr>
+<tr>
+<td>transaction_id</td>
+<td style="text-align:center">是</td>
+<td style="text-align:right">6字节</td>
+<td style="text-align:right">事务ID</td>
+</tr>
+<tr>
+<td>roll_pointer</td>
+<td style="text-align:center">是</td>
+<td style="text-align:right">7字节</td>
+<td style="text-align:right">回滚指针</td>
+</tr>
+</tbody>
+</table>
+<p>因为我们之前创建的表record_format_demo并没有定义主键，所以MySQL服务器会为每条记录增加上述的3个列。现在看一下加上记录的真实数据的两个记录长什么样吧：</p>
+<p><img src="/upload/compact_row_real.png" alt="avatar"></p>
+<p>需要说明几点:</p>
+<ol>
+<li><p>表record_format_demo使用的是ascii字符集，所以0x61616161就表示字符串’aaaa’，0x626262就表示字符串’bbb’，以此类推。</p>
+</li>
+<li><p>注意第1条记录中c3列的值，它是CHAR(10)类型的，它实际存储的字符串是：’cc’，ascii字符集中的字节表示是’0x6363’，虽然表示这个字符串只占用了2个字节，但整个c3列仍然占用了10个字节的空间，除真实数据以外的8个字节的统统都用空格字符填充，空格字符在ascii字符集的表示就是0x20。</p>
+</li>
+<li><p>注意第2条记录中c3和c4列的值都为NULL，它们被存储在了前边的NULL值列表处，在记录的真实数据处就不再冗余存储，从而节省存储空间。</p>
+</li>
+</ol>
+<h1 id="行溢出数据"><a href="#行溢出数据" class="headerlink" title="行溢出数据"></a>行溢出数据</h1><p>InnoDB存储引擎可以将一条记录中的某些真实数据存储在真正的数据页面之外。一般认为BOLO这类的大对象列类型的存储会把数据存放在数据页面之外。但是这个理解有点偏差，BLOB可以不将数据放在溢出页面，而且即便是VARCHAR类型的数据依然有可也能被存放为行溢出数据。</p>
+<h2 id="VARCHAR-M-最多能存储的数据"><a href="#VARCHAR-M-最多能存储的数据" class="headerlink" title="VARCHAR(M)最多能存储的数据"></a>VARCHAR(M)最多能存储的数据</h2><p>我们知道对于VARCHAR(M)类型的列最多可以占用65535个字节。其中的M代表该类型最多存储的字符数量，如果我们使用ascii字符集的话，一个字符就代表一个字节，我们看看VARCHAR(65535)是否可用：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Database changed</div><div class="line">mysql&gt; CREATE TABLE test(</div><div class="line">    -&gt;             c VARCHAR(65535)</div><div class="line">    -&gt;         ) CHARSET=ascii ROW_FORMAT=Compact;</div><div class="line">ERROR 1118 (42000): Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs</div><div class="line">mysql&gt;</div></pre></td></tr></table></figure>
+<p>从报错信息里可以看出，MySQL对一条记录占用的最大存储空间是有限制的，除了BLOB或者TEXT类型的列之外，其他所有的列（不包括隐藏列和记录头信息）占用的字节长度加起来不能超过65535个字节。所以MySQL服务器建议我们把存储类型改为TEXT或者BLOB的类型。这个65535个字节除了列本身的数据之外，还包括一些storage overhead，比如说我们为了存储一个VARCHAR(M)类型的列，需要占用3部分存储空间：</p>
+<ul>
+<li>真实数据</li>
+<li>真实数据占用字节的长度</li>
+<li>NULL值标识，如果该列有NOT NULL属性则可以没有这部分存储空间<br>如果该VARCHAR类型的列没有NOT NULL属性，那最多只能存储65532个字节的数据，因为真实数据的长度需要占用2个字节，NULL值标识需要占用1个字节：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Database changed</div><div class="line">mysql&gt; CREATE TABLE varchar_size_demo(</div><div class="line">    -&gt;            c VARCHAR(65532)</div><div class="line">    -&gt;       ) CHARSET=ascii ROW_FORMAT=Compact;</div><div class="line">Query OK, 0 rows affected (0.05 sec)</div></pre></td></tr></table></figure>
+<p>如果VARCHAR类型的列有NOT NULL属性，那最多只能存储65533个字节的数据，因为真实数据的长度需要占用2个字节，不需要NULL值标识：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mysql&gt; CREATE TABLE varchar_size_demo(</div><div class="line">    -&gt;            c VARCHAR(65533) NOT NULL</div><div class="line">    -&gt;       ) CHARSET=ascii ROW_FORMAT=Compact;</div><div class="line">Query OK, 0 rows affected (0.03 sec)</div></pre></td></tr></table></figure>
+<p>如果VARCHAR(M)类型的列使用的不是ascii字符集，那会怎么样呢？来看一下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">mysql&gt; CREATE TABLE varchar_size_demo_utf(</div><div class="line">    -&gt;             c VARCHAR(65532)</div><div class="line">    -&gt;       ) CHARSET=utf8 ROW_FORMAT=Compact;</div><div class="line">Query OK, 0 rows affected, 1 warning (0.02 sec)</div><div class="line"></div><div class="line">mysql&gt; SHOW WARNINGS</div><div class="line">    -&gt; ;</div><div class="line">+-------+------+--------------------------------------------+</div><div class="line">| Level | Code | Message                                    |</div><div class="line">+-------+------+--------------------------------------------+</div><div class="line">| Note  | 1246 | Converting column 'c' from VARCHAR to TEXT |</div><div class="line">+-------+------+--------------------------------------------+</div><div class="line">1 row in set (0.00 sec)</div></pre></td></tr></table></figure>
+<p>需要注意的是，如果没有将SQL_MODE设为严格模式，或许可以建表，如上所示，但是MYSQL数据库会抛出一个warning.表示自动将VARCHAR类型转换为TEXT类型，如下</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mysql&gt; show create table varchar_size_demo_utf;</div><div class="line">+-----------------------+-----------------------------------------------------------------------------------------------------------------+</div><div class="line">| Table                 | Create Table                                                                                                    |</div><div class="line">+-----------------------+-----------------------------------------------------------------------------------------------------------------+</div><div class="line">| varchar_size_demo_utf | CREATE TABLE `varchar_size_demo_utf` (</div><div class="line">  `c` mediumtext</div><div class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT |</div><div class="line">+-----------------------+-----------------------------------------------------------------------------------------------------------------+</div><div class="line">1 row in set (0.00 sec)</div></pre></td></tr></table></figure>
+<p>在sql_mode 中加入STRICT_TRANS_TABLES，表示开启严格模式，该模式下创建表如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">mysql&gt; CREATE TABLE varchar_size_gbk(</div><div class="line">    -&gt;       c VARCHAR(65532)</div><div class="line">    -&gt; ) CHARSET=gbk ROW_FORMAT=Compact;</div><div class="line">ERROR 1074 (42000): Column length too big for column 'c' (max = 32767); use BLOB or TEXT instead</div><div class="line"></div><div class="line">mysql&gt; CREATE TABLE varchar_size_utf(</div><div class="line">    -&gt;       c VARCHAR(65532)</div><div class="line">    -&gt; ) CHARSET=utf8 ROW_FORMAT=Compact;</div><div class="line">ERROR 1074 (42000): Column length too big for column 'c' (max = 21845); use BLOB or TEXT instead</div><div class="line">mysql&gt;</div></pre></td></tr></table></figure>
+<p>可以看到这次即使创建列的VARCHAR长度为65532，也会提示报错，但是这两次对max值的提示不同。那M的最大取值取决于该字符集表示一个字符最多需要的字节数。比方说gbk字符集表示一个字符最多需要2个字节，那在该字符集下，M的最大取值就是32767，也就是说最多能存储32767个字符；utf8字符集表示一个字符最多需要3个字符，那在该字符集下，M的最大取值就是21845，也就是说最多能存储21845个字符<br>因此从这个例子中可以知道VARCHAR(N)中的N指的是字符的长度，而平时文档中所说的VARCHAR类型最大支持65535，单位是字节。</p>
+<p>需要注意的是，MySQL官方手册中定义的65535长度是指所有列长度的总和。如果列的长度总和超出这个长度依然无法创建，如下所示：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mysql&gt; CREATE TABLE varchar_size_demo23(</div><div class="line">    -&gt;                 c VARCHAR(65531) NOT NULL,</div><div class="line">    -&gt;                 d int</div><div class="line">    -&gt;            ) CHARSET=ascii ROW_FORMAT=Compact;</div><div class="line">ERROR 1118 (42000): Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs</div></pre></td></tr></table></figure>
+<h2 id="记录中数据太多而溢出"><a href="#记录中数据太多而溢出" class="headerlink" title="记录中数据太多而溢出"></a>记录中数据太多而溢出</h2><p>我们以ascii字符集下的varchar_size_demo表为例，插入一条记录：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mysql&gt; CREATE TABLE varchar_size_demo(</div><div class="line">    -&gt;       c VARCHAR(65532)</div><div class="line">    -&gt; ) CHARSET=ascii ROW_FORMAT=Compact;</div><div class="line">Query OK, 0 rows affected (0.01 sec)</div><div class="line"></div><div class="line">mysql&gt; INSERT INTO varchar_size_demo(c) VALUES(REPEAT('a', 65532));</div><div class="line">Query OK, 1 row affected (0.00 sec)</div><div class="line"></div><div class="line">mysql&gt;</div></pre></td></tr></table></figure>
+<p>其中的REPEAT(‘a’, 65532)是一个函数调用，它表示生成一个把字符’a’重复65532次的字符串。但是MySQL是以页为基本单位来管理存储空间的，我们的记录都会被分配到某个页中存储。而一个页的大小是16KB，也就是16384字节，而一个VARCHAR(M)类型的列就最多可以存储65532个字节，这样就可能造成一个页存放不了一条记录的尴尬情况，这就产生了<strong>行溢出</strong>。正常来讲数据都是存储在类型为B-tree Node的页中，但是当发生行溢出的情况时，数据会存放在页类型为Uncompress BOLB页中。</p>
+<p>在Compact行格式中，对于占用存储空间非常大的列，在记录的真实数据处只会存储该列的一部分数据，把剩余的数据分散存储在几个连续的页中，只在记录的真实数据处用20个字节存储指向这些页的地址，从而可以找到剩余数据所在的页，如图所示：</p>
+<p><img src="/upload/row_overflow.png" alt="avatar"></p>
+<p>可以看到在数据页中，值保存了VARCHAR的前768字节前缀数据，后边20个字节指向行溢出页。</p>
+<p>不只是 VARCHAR(M) 类型的列，其他的 TEXT、BLOB 类型的列在存储数据非常多的时候也会发生行溢出</p>
+<h2 id="行溢出临界点"><a href="#行溢出临界点" class="headerlink" title="行溢出临界点"></a>行溢出临界点</h2><p>那发生行溢出的临界点是什么呢？也就是说在列存储多少字节的数据时就会发生行溢出？</p>
+<p>MySQL中规定一个页中至少存放两行记录，（因为内部存储是B+tree的结构，这样每个页中至少应该有两行记录，否则失去了B+tree的意义，成为了单链表了）<br>以我们以上边的varchar_size_demo表为例，它只有一个列c，我们往这个表中插入两条记录，每条记录最少插入多少字节的数据才会行溢出的现象呢？这得分析一下页中的空间都是如何利用的。</p>
+<ul>
+<li><p>每个页除了存放我们的记录以外，也需要存储一些额外的信息，乱七八糟的额外信息加起来需要136个字节的空间（现在只要知道这个数字就好了），其他的空间都可以被用来存储记录。</p>
+</li>
+<li><p>每个记录需要的额外信息是27字节。</p>
+</li>
+</ul>
+<p>这27个字节包括下边这些部分：</p>
+<ul>
+<li>2个字节用于存储真实数据的长度</li>
+<li>1个字节用于存储列是否是NULL值</li>
+<li>5个字节大小的头信息</li>
+<li>6个字节的row_id列</li>
+<li>6个字节的transaction_id列</li>
+<li>7个字节的roll_pointer列<br>假设一个列中存储的数据字节数为n，那么发生行溢出现象时需要满足这个式子：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">136 + 2×(27 + n) &gt; 16384</div></pre></td></tr></table></figure>
+<p>求解这个式子得出的解是：n &gt; 8098。也就是说如果一个列中存储的数据不大于8098个字节，那就不会发生行溢出，否则就会发生行溢出。</p>
+<p>我们这个只是针对只有一个列的varchar_size_demo表来说的，如果表中有多个列，那上边的式子又得改一改了，所以重点就是：<br><strong> 你不用关注这个临界点是什么，只要知道如果我们想一个行中存储了很大的数据时，可能发生行溢出的现象。</strong></p>
+<p>需要注意的是，对于TEXT和BOLB的数据类型，我们总以为他们是存放在Uncompressed BOLB page中的，其实这也不准确。是否放在BOLB 页中，和前面讨论的VARCHAR一样，至少保证一个页存放两个记录，如果你插入的数据很小，那么一样不会放在BLOB page中。不过既然用户选择了BLOB列类型，一般不可能存放长度这么小的数据。因此大多数情况下BLOB的行数居还是会发生行溢出的，实际保存在BLOB页中，数据页中只保存数据的前768字节。</p>
+<h2 id="CHAR的行存储结构"><a href="#CHAR的行存储结构" class="headerlink" title="CHAR的行存储结构"></a>CHAR的行存储结构</h2><p>通常理解VARCHAR是存储变长长度的字符类型，CHAR是存储固定长度的字符类型。但是从他MySQL 4.1版本开始，CHAR(N)中N只的是字符的长度，而不是字节的长度。<br>也就是说在不同的字符集下，CHAR类型内部存储可能不是定长的数据。例如，对于UTF-8下CHAR(10)类型的列，其最小可以存储10个字节的字符，而最大可以存储30个字节的字符。因此对于<strong>多字节</strong>字符编码的CHAR数据类型的存储，InnoDB存储引擎在内部将其视为变长字符类型。这也就意味着在在变长长度列表中会记录CHAR数据类型的长度。</p>
+<p>比如，我们修改之前创建的表record_format_demo为utf-8（注意之前是ascii）<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mysql&gt; ALTER TABLE record_format_demo MODIFY COLUMN c3 CHAR(10) CHARACTER SET utf8;</div><div class="line">Query OK, 2 rows affected (0.02 sec)</div><div class="line">Records: 2  Duplicates: 0  Warnings: 0</div><div class="line"></div><div class="line">mysql&gt;</div></pre></td></tr></table></figure></p>
+<p>修改该列字符集后记录的变长字段长度列表也发生了变化，如图：<br><img src="/upload/char_mutil_byte.png" alt="avatar"></p>
+<p>就像上面说的，在多字节字符集类型下，CHAR类型被明确视为了变长字符类型，因此可以认为在多字节字符集的情况下，CHAR和VARCHAR的实际行存储基本是没有区别的。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>mySQL官方文档： <a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-physical-record.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.7/en/innodb-physical-record.html</a><br>mysql设置严格模式：<a href="https://www.cnblogs.com/xccjmpc/p/6401722.html" target="_blank" rel="external">https://www.cnblogs.com/xccjmpc/p/6401722.html</a></p>
 
       
     </div>
@@ -553,7 +704,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -615,7 +766,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Compact行记录格式"><span class="nav-number">2.</span> <span class="nav-text">Compact行记录格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#变长字段长度"><span class="nav-number">2.1.</span> <span class="nav-text">变长字段长度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NULL值列表"><span class="nav-number">2.2.</span> <span class="nav-text">NULL值列表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Compact行记录格式"><span class="nav-number">2.</span> <span class="nav-text">Compact行记录格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#变长字段长度"><span class="nav-number">2.1.</span> <span class="nav-text">变长字段长度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NULL值列表"><span class="nav-number">2.2.</span> <span class="nav-text">NULL值列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#记录头信息"><span class="nav-number">2.3.</span> <span class="nav-text">记录头信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#记录的真实数据"><span class="nav-number">2.4.</span> <span class="nav-text">记录的真实数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#行溢出数据"><span class="nav-number">3.</span> <span class="nav-text">行溢出数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VARCHAR-M-最多能存储的数据"><span class="nav-number">3.1.</span> <span class="nav-text">VARCHAR(M)最多能存储的数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#记录中数据太多而溢出"><span class="nav-number">3.2.</span> <span class="nav-text">记录中数据太多而溢出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#行溢出临界点"><span class="nav-number">3.3.</span> <span class="nav-text">行溢出临界点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CHAR的行存储结构"><span class="nav-number">3.4.</span> <span class="nav-text">CHAR的行存储结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
