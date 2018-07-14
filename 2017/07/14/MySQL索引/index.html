@@ -1,0 +1,831 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.useso.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java, Meituan" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="概述InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。
+本文会详细介InnoDB中的索引结构。注意 本文是建立在  innodb记录存储结构 和">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL索引">
+<meta property="og:url" content="http://yoursite.com/2017/07/14/MySQL索引/index.html">
+<meta property="og:site_name" content="marc's home">
+<meta property="og:description" content="概述InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。
+本文会详细介InnoDB中的索引结构。注意 本文是建立在  innodb记录存储结构 和">
+<meta property="og:image" content="http://yoursite.com/upload/index_demo1.png">
+<meta property="og:image" content="http://yoursite.com/upload/index_demo4.png">
+<meta property="og:image" content="http://yoursite.com/upload/index_demo2.png">
+<meta property="og:image" content="http://yoursite.com/upload/index_demo3.png">
+<meta property="og:image" content="http://yoursite.com/upload/index_demo6.png">
+<meta property="og:image" content="http://yoursite.com/upload/index_demo7.png">
+<meta property="og:image" content="http://yoursite.com/upload/index_demo8.png">
+<meta property="og:image" content="http://yoursite.com/upload/index_demo9.png">
+<meta property="og:updated_time" content="2018-07-14T16:13:34.629Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL索引">
+<meta name="twitter:description" content="概述InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。
+本文会详细介InnoDB中的索引结构。注意 本文是建立在  innodb记录存储结构 和">
+<meta name="twitter:image" content="http://yoursite.com/upload/index_demo1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/07/14/MySQL索引/"/>
+
+
+
+
+
+  <title> MySQL索引 | marc's home </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">marc's home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/14/MySQL索引/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="marc's home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                MySQL索引
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-14T19:25:00+08:00">
+                2017-07-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。</p>
+<p>本文会详细介InnoDB中的索引结构。<br><strong>注意</strong> 本文是建立在  <a href="/2017/07/11/innodb记录存储结构/" title="innodb记录存储结构">innodb记录存储结构</a> 和  <a href="/2017/07/14/InnoDB数据页结构/" title="InnoDB数据页结构">InnoDB数据页结构</a> 这两篇文章的基础上的。<br>同时，对于B+树的基础知识请自行Google，或者可以看看JULY这篇文章 <a href="https://blog.csdn.net/peterchan88/article/details/52248714" target="_blank" rel="external">https://blog.csdn.net/peterchan88/article/details/52248714</a> 讲的很详细。</p>
+<a id="more"></a>
+<h1 id="前戏"><a href="#前戏" class="headerlink" title="前戏"></a>前戏</h1><p>我们先建立一个表：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">mysql&gt; CREATE TABLE index_demo(</div><div class="line">    -&gt;     c1 INT,</div><div class="line">    -&gt;     c2 INT,</div><div class="line">    -&gt;     c3 CHAR(1),</div><div class="line">    -&gt;     PRIMARY KEY(c1)</div><div class="line">    -&gt; ) ROW_FORMAT = Compact;</div><div class="line">Query OK, 0 rows affected (0.03 sec)</div><div class="line">mysql&gt;</div></pre></td></tr></table></figure>
+<p>这个新建的index_demo表中有2个INT类型的列，1个CHAR(1)类型的列，而且我们规定了c1列为主键，这个表使用Compact行格式来实际存储记录的。为了我们理解上的方便，我们简化了一下index_demo表的行格式示意图：</p>
+<p><img src="/upload/index_demo1.png" alt="avatar"></p>
+<p>我们只在示意图里展示记录的这几个部分：</p>
+<ul>
+<li><p>record_type：记录头信息的一项属性，表示记录的类型，0表示普通记录、2表示最小记录、3表示最大记录、1我们还没用过，等会再说～</p>
+</li>
+<li><p>next_type：记录头信息的一项属性，表示下一条地址的偏移量，为了方便大家理解，我们都会用箭头来表明下一条记录是谁。</p>
+</li>
+<li><p>各个列的值：就是各个数据列的值，其中我们用橘黄色的格子代表c1列，深蓝色的格子代表c2列，红色格子代表c3列。</p>
+</li>
+<li><p>其他信息：除了上述3种信息以外的所有信息，包括其他隐藏列的值以及记录的额外信息。</p>
+</li>
+</ul>
+<p>为了节省篇幅，我们之后的示意图中会把记录的其他信息这个部分省略掉，因为它占地方并且不会有什么观赏效果。另外，为了方便理解，我们觉得把记录竖着放看起来感觉更好，所以将记录格式示意图的其他信息去掉并把它竖起来的效果就是这样：</p>
+<p><img src="/upload/index_demo4.png" alt="avatar"><br>把一些记录放到页里边的示意图就是：</p>
+<p><img src="/upload/index_demo2.png" alt="avatar"></p>
+<p>在  <a href="/2017/07/14/InnoDB数据页结构/" title="InnoDB数据页结构">InnoDB数据页结构</a> 中我们知道，记录在页中是一个单链表的组成，而且是根据主键由小到大排列的，在一个页中查找某个记录可以在 page directory中根据槽做二叉查找从而快速定位记录所在的位置。大部分情况下我们表中存放的记录都是非常多的，需要好多的数据页来存储这些记录。在很多页中查找记录的话可以分为两个步骤：</p>
+<ol>
+<li>定位到记录所在的页。</li>
+<li>从所在的页内中查找相应的记录。</li>
+</ol>
+<p>页中的查找我们已经知道了，那么如何定位记录所在的页呢？</p>
+<p>所以如果我们想快速的定位到需要查找的记录在哪些数据页就可以像为数据页中的记录建立一个目录一样，我们也可以为所有的数据页建立一个目录，建立目录就要满足以下条件：</p>
+<ul>
+<li><strong>下一个数据页的主键值必须大于上一个页中的主键值</strong>。</li>
+</ul>
+<p>在InnoDB中，通过B+树来对这些页做索引，将用户存放的数据全部放到B+树的叶子节点中，而且叶子节点中的记录是按照主键进行排序的。在插入或者删除记录的时候，为了保持B+树的特性，会存在节点的分裂或者合并。（这些都可以在B+树的基础知识中看到）。</p>
+<h1 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h1><p>InnoDB存储引擎是索引组织表，即表中数据按照主键顺序存储。而聚簇索引（clustered index）就是按照每张表的<strong>主键</strong>构造一颗B+树，同时叶子节点中存放的即为整张表的行记录数据，也将聚簇索引的叶子节点称为数据页。每个数据页都通过一个双向链表来进行链接。</p>
+<p>由于实际的数据页只能按照一颗B+树进行排序，因此每张表只能拥有<strong>一个聚簇索引</strong>。在多数情况下，查询优化器倾向于采用聚簇索引。因为聚簇索引能够在B+树索引的叶子节点上直接找到数据。此外，由于定义了数据的逻辑顺序，聚集索引能够特别快的访问针对范围的值查询。</p>
+<p>首先我们假设一个数据页中，只能存放4条记录，当在表中插入比较多记录之后，聚集索引对应的B+树如下：</p>
+<p><img src="/upload/index_demo3.png" alt="avatar"></p>
+<p>说明以下几点：</p>
+<ol>
+<li><p>我们的实际用户记录其实都存放在B+树的最底层的节点上，这些节点也被称为叶子节点或叶节点,这些节点的PAGE_LEVEL = 0，表示叶节点总在第0层; 其余的节点都是用来存放目录项的，这些节点统统被称为内节点或者说非叶节点, 这些节点的PAGE_LEVEL 从叶节点开始逐层加1。</p>
+</li>
+<li><p>目录项记录的record_type值是1，而普通用户记录的record_type值是0。同时，目录项记录只有主键值和指向数据页的页号两个列（不是一个完整的行记录），而普通的用户记录的列是用户自己定义的，可能包含很多列，另外还有InnoDB自己添加的隐藏列。除此之外，目录项的页和数据页是完全一样的。它们用的是一样的数据页（页面类型都是0x45BF，这个属性在Page Header中，忘了的话可以翻到前边的文章看），页的组成结构也是一样一样的（就是我们前边介绍过的7个部分），都会为主键值生成Page Directory（页目录）以加快在页内的查询速度</p>
+</li>
+<li><p>聚集索引的存储并不是物理上连续的，而是逻辑上连续的。一方面页通过双向链表链接，页按照主键的顺序排序；另一方面，每个页中的记录通过单项链表进行维护，物理存储上可以同样不用按照主键存储。</p>
+</li>
+</ol>
+<p>到这里，我们再次总结一下聚集索引（聚簇索引）的特点：</p>
+<ol>
+<li><p>使用记录主键值的大小进行记录和页的排序，这包括三个方面的含义：</p>
+<ul>
+<li>页内的记录是按照主键的大小顺序排成一个单向链表。</li>
+<li>各个存放用户记录的页也是根据页中记录的主键大小顺序排成一个双向链表。</li>
+<li>各个存放目录项的页也是根据页中记录的主键大小顺序排成一个双向链表。</li>
+</ul>
+</li>
+<li><p>B+树的叶子节点存储的是完整的用户记录。所谓完整的用户记录，就是指这个记录中存储了所有列的值。</p>
+</li>
+</ol>
+<p>聚簇索引的另一个好处是，它对于主键的排序查找和范围查找速度非常快。叶子节点的数据就是用户所要查询的数据。比如用户需要查询一张注册用户的表，查询最后注册的10位用户，由于B+树索引是双向链表的，用户可以快速找到最后一个数据页，并取出10条记录</p>
+<h1 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h1><p>上边介绍的聚簇索引只能在搜索条件是主键值时才能发挥作用，因为B+树中的数据都是按照主键进行排序的。那如果我们想以别的列作为搜索条件该咋办呢？难道只能从头到尾沿着链表依次遍历记录么？<br>上边介绍的聚簇索引只能在搜索条件是主键值时才能发挥作用，因为B+树中的数据都是按照主键进行排序的。那如果我们想以别的列作为搜索条件该咋办呢？难道只能从头到尾沿着链表依次遍历记录么？当然，我们可以多建几棵B+树，不同的B+树中的数据采用不同的排序规则。比方说我们用c2列的大小作为数据页、页中记录的排序规则，再建一棵B+树，效果如下图所示：</p>
+<p><img src="/upload/index_demo6.png" alt="avatar"></p>
+<p>这个B+树与上边介绍的聚簇索引有几处不同：</p>
+<ol>
+<li><p>使用记录c2列的大小进行记录和页的排序，这包括三个方面的含义：</p>
+<ul>
+<li>页内的记录是按照c2列的大小顺序排成一个单向链表。</li>
+<li>各个存放用户记录的页也是根据页中记录的c2列大小顺序排成一个双向链表。</li>
+<li>各个存放目录项的页也是根据页中记录的c2列大小顺序排成一个双向链表。</li>
+</ul>
+</li>
+<li><p>B+树的叶子节点存储的并不是完整的用户记录，而只是c2列+主键这两个列的值。</p>
+</li>
+</ol>
+<p>所以如果我们现在想通过c2列的值查找某些记录的话就可以使用我们刚刚建好的这个B+树了，以查找c2列的值为4的记录为例，查找过程如下：</p>
+<ol>
+<li><p>确定目录项记录页——根据根页面，也就是页44，可以快速定位到目录项记录所在的页为页42（因为2 &lt; 4 &lt; 9）。</p>
+</li>
+<li><p>通过目录项记录页确定用户记录真实所在的页。—— 在页42中可以快速定位到实际存储用户记录的页，但是由于c2列并没有唯一性约束，所以c2列值为4的记录可能分布在多个数据页中，又因为2 &lt; 4 ≤ 4，所以确定实际存储用户记录的页在页34和页35中。</p>
+</li>
+<li><p>在真实存储用户记录的页中定位到具体的记录——到页34和页35中定位到具体的记录。</p>
+</li>
+<li><p>但是这个B+树的叶子节点中的记录只存储了c2和c1（也就是主键）两个列，所以我们必须再根据主键值去聚簇索引中再查找一遍完整的用户记录。</p>
+</li>
+</ol>
+<p>可以看到，我们根据这个以c2列大小排序的B+树只能确定我们要查找记录的主键值，所以如果我们想根据c2列的值查找到完整的用户记录的话，仍然需要到聚簇索引中再查一遍，这个过程也被称为回表。也就是根据c2列的值查询一条完整的用户记录需要使用到2棵B+树！</p>
+<p>为什么我们还需要一次回表操作呢？直接把完整的用户记录放到叶子节点不就好了么？你说的对，如果把完整的用户记录放到叶子节点是可以不用回表，但是太占地方了呀～相当于每建立一棵B+树都需要把所有的用户记录再都拷贝一遍，这就有点太浪费存储空间了。因为这种按照非主键列建立的B+树需要一次回表操作才可以定位到完整的用户记录，所以这种B+树也被称为二级索引（英文名secondary index），或者辅助索引。由于我们使用的是c2列的大小作为B+树的排序规则，所以我们也称这个B+树为为c2列建立的索引。</p>
+<h1 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h1><p>我们也可以同时以多个列的大小作为排序规则，也就是同时为多个列建立索引，比方说我们想让B+树按照c2和c3列的大小进行排序，这个包含两层：</p>
+<ul>
+<li>先把各个记录和页按照c2列进行排序。</li>
+<li>在记录的c2列相同的情况下，采用c3列进行排序<br>为c2和c3列建立的索引的示意图如下：</li>
+</ul>
+<p><img src="/upload/index_demo7.png" alt="avatar"></p>
+<p>如图所示，我们需要注意一下几点：</p>
+<ul>
+<li>每条目录项记录都由c2、c3、页号这三个部分组成，各条记录先按照c2列的值进行排序，如果记录的c2列相同，则按照c3列的值进行排序。</li>
+<li>B+树叶子节点处的用户记录由c2、c3和主键c1列组成。</li>
+</ul>
+<p>千万要注意一点，以c2和c3列的大小为排序规则建立的B+树称为联合索引，它的意思与分别为c2和c3列建立索引的表述是不同的，不同点如下：</p>
+<ul>
+<li>建立联合索引只会建立如上图一样的1棵B+树。</li>
+<li>为c2和c3列建立索引会分别以c2和c3列的大小为排序规则建立2棵B+树。</li>
+</ul>
+<h1 id="B-树索引的分裂"><a href="#B-树索引的分裂" class="headerlink" title="B+树索引的分裂"></a>B+树索引的分裂</h1><p>数据库中B+树索引页的分裂并不总是从页的中间记录开始，这样可能造成页空间的浪费。例如下面的记录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">1、2、3、4、5、6、7、8、9</div></pre></td></tr></table></figure>
+<p>插入是根据自增顺序进行的，若这时插入10这条记录后需要进行页的分裂操作，那么根据正常（绝大部分数据结构介绍的）B+树的分裂方法，会将记录5作为分裂点记录（split record）,分裂后得到下面两个页</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">P1: 1、2、3、4</div><div class="line">P2: 5、6、7、8、9、10</div></pre></td></tr></table></figure>
+<p>然而由于插入是顺序的，P1这个页将不会再有记录的插入，从而导致空间的浪费。而P2又会再次进行分裂。<br>InnoDB存储引擎的Page Header中有以下几部分保存插入的顺序信息：</p>
+<ul>
+<li>PAGE_LAST_INSERT： 最后插入记录的位置</li>
+<li>PAGE_DIRECTION：最后插入的方向</li>
+<li>PAGE_N_DIRECTION： 一个方向连续插入的记录数量</li>
+</ul>
+<p>通过这些信息，InnoDB可以决定是向左还是向右进行分裂，同时决定分裂点记录为哪一个。若是随机插入，则取页的中间记录作为分裂点的记录。若向同一方向进行插入的记录数量是5，并且目前已经定位（cursor）到的记录（InnoDB进行插入的时候，首先需要进行定位，定位到的记录为带插入记录的前一条记录）之后还有3条记录，则分裂点的记录为定位到的记录后的第三条记录，否则分裂点记录就是待插入的记录。</p>
+<p>来看一个向右分裂的例子，并且定位到的记录之后还有3条记录，则分裂情况如下：<br><img src="/upload/index_demo8.png" alt="avatar"></p>
+<p>而对于下图的情况，分裂点就为插入记录本身，向右分裂后仅插入记录本身，这在自增插入时是普遍存在的一种情况：<br><img src="/upload/index_demo9.png" alt="avatar"></p>
+<h1 id="索引管理"><a href="#索引管理" class="headerlink" title="索引管理"></a>索引管理</h1><h2 id="Fast-Index-Creation"><a href="#Fast-Index-Creation" class="headerlink" title="Fast Index Creation"></a>Fast Index Creation</h2><p>MySQL 5.5 版本之前（不包括5.5）存在一个普遍被人诟病的问题是MySQL数据库对于索引的添加或者删除这类DDL操作，MySQL数据库的操作过程为：</p>
+<ol>
+<li>首先创建一张新的临时表，表结构为通过命令ALTER TABLE新定义的结构</li>
+<li>然后把原表中的数据导入到临时表中。</li>
+<li>接着删除原表。</li>
+<li>最后把临时表重命名为原来的表名。</li>
+</ol>
+<p>可以发现，若用户对于一张大表进行索引的添加和删除操作，那么这会需要很长的时间。更关键的是，若有大量事务需要访问正在被修改的表，这意味着数据库服务不可用。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/14/InnoDB数据页结构/" rel="next" title="InnoDB数据页结构">
+                <i class="fa fa-chevron-left"></i> InnoDB数据页结构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/lufei.jpg"
+               alt="marc" />
+          <p class="site-author-name" itemprop="name">marc</p>
+           
+              <p class="site-description motion-element" itemprop="description">Keep on going</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/amazingmarc" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://tech.meituan.com/" title="美团技术博客" target="_blank">美团技术博客</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前戏"><span class="nav-number">2.</span> <span class="nav-text">前戏</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#聚簇索引"><span class="nav-number">3.</span> <span class="nav-text">聚簇索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#辅助索引"><span class="nav-number">4.</span> <span class="nav-text">辅助索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#联合索引"><span class="nav-number">5.</span> <span class="nav-text">联合索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#B-树索引的分裂"><span class="nav-number">6.</span> <span class="nav-text">B+树索引的分裂</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引管理"><span class="nav-number">7.</span> <span class="nav-text">索引管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Fast-Index-Creation"><span class="nav-number">7.1.</span> <span class="nav-text">Fast Index Creation</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">marc</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
