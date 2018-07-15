@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next mist use-motion" lang="zh-Hans">
+<html class="theme-next pisces use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -92,7 +92,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL索引的使用">
 <meta property="og:url" content="http://yoursite.com/2017/07/15/MySQL索引的使用/index.html">
-<meta property="og:site_name" content="marc's home">
+<meta property="og:site_name" content="LiChaofan">
 <meta property="og:description" content="概述在了解B+树索引的本质和实现后，下一个需要考虑的问题是怎样正确地使用B+树索引，这不是一个简单的问题。这里总结的可能并不适用与所有的应用场合。我所能做的只是概括一个大概的方向。在实际应用中，每个开发人员还是需要根据自己的具体生成环境来使用索引，并观察索引使用的情况，判断是否需要添加索引。不要盲从任何人给你的经验意见，Think Different。
 注意 本文是建立在  MySQL索引 篇文章">
 <meta property="og:image" content="http://yoursite.com/upload/index_user_demo1.png">
@@ -110,8 +110,8 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Mist',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    scheme: 'Pisces',
+    sidebar: {"position":"right","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
     fancybox: true,
     motion: true,
     duoshuo: {
@@ -136,7 +136,7 @@
 
 
 
-  <title> MySQL索引的使用 | marc's home </title>
+  <title> MySQL索引的使用 | LiChaofan </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -161,7 +161,7 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail ">
+  <div class="container sidebar-position-right page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -172,7 +172,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">marc's home</span>
+        <span class="site-title">LiChaofan</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -226,6 +226,16 @@
           </a>
         </li>
       
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
 
       
     </ul>
@@ -264,7 +274,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="marc's home">
+      <meta itemprop="name" content="LiChaofan">
     </span>
 
     
@@ -708,12 +718,16 @@
           <div class="links-of-blogroll motion-element links-of-blogroll-inline">
             <div class="links-of-blogroll-title">
               <i class="fa  fa-fw fa-globe"></i>
-              Links
+              友情链接
             </div>
             <ul class="links-of-blogroll-list">
               
                 <li class="links-of-blogroll-item">
                   <a href="https://tech.meituan.com/" title="美团技术博客" target="_blank">美团技术博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://blog.csdn.net/v_JULY_v" title="v_JULY_v" target="_blank">v_JULY_v</a>
                 </li>
               
             </ul>
@@ -835,6 +849,13 @@
 
   
   
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
 
   
   <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
