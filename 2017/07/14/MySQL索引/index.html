@@ -88,13 +88,13 @@
 
 
 <meta name="description" content="概述InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。
-本文会详细介InnoDB中的索引结构。注意 本文是建立在  innodb记录存储结构 和">
+接下来我们详细介绍一下InnoDB中的索引结构。注意 本文是建立在  innodb记录存">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL索引">
 <meta property="og:url" content="http://yoursite.com/2017/07/14/MySQL索引/index.html">
 <meta property="og:site_name" content="marc's home">
 <meta property="og:description" content="概述InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。
-本文会详细介InnoDB中的索引结构。注意 本文是建立在  innodb记录存储结构 和">
+接下来我们详细介绍一下InnoDB中的索引结构。注意 本文是建立在  innodb记录存">
 <meta property="og:image" content="http://yoursite.com/upload/index_demo1.png">
 <meta property="og:image" content="http://yoursite.com/upload/index_demo4.png">
 <meta property="og:image" content="http://yoursite.com/upload/index_demo2.png">
@@ -103,11 +103,11 @@
 <meta property="og:image" content="http://yoursite.com/upload/index_demo7.png">
 <meta property="og:image" content="http://yoursite.com/upload/index_demo8.png">
 <meta property="og:image" content="http://yoursite.com/upload/index_demo9.png">
-<meta property="og:updated_time" content="2018-07-14T16:13:34.629Z">
+<meta property="og:updated_time" content="2018-07-15T09:07:19.789Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL索引">
 <meta name="twitter:description" content="概述InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。
-本文会详细介InnoDB中的索引结构。注意 本文是建立在  innodb记录存储结构 和">
+接下来我们详细介绍一下InnoDB中的索引结构。注意 本文是建立在  innodb记录存">
 <meta name="twitter:image" content="http://yoursite.com/upload/index_demo1.png">
 
 
@@ -356,7 +356,7 @@
 
       
         <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。</p>
-<p>本文会详细介InnoDB中的索引结构。<br><strong>注意</strong> 本文是建立在  <a href="/2017/07/11/innodb记录存储结构/" title="innodb记录存储结构">innodb记录存储结构</a> 和  <a href="/2017/07/14/InnoDB数据页结构/" title="InnoDB数据页结构">InnoDB数据页结构</a> 这两篇文章的基础上的。<br>同时，对于B+树的基础知识请自行Google，或者可以看看JULY这篇文章 <a href="https://blog.csdn.net/peterchan88/article/details/52248714" target="_blank" rel="external">https://blog.csdn.net/peterchan88/article/details/52248714</a> 讲的很详细。</p>
+<p>接下来我们详细介绍一下InnoDB中的索引结构。<br><strong>注意</strong> 本文是建立在  <a href="/2017/07/11/innodb记录存储结构/" title="innodb记录存储结构">innodb记录存储结构</a> 和  <a href="/2017/07/14/InnoDB数据页结构/" title="InnoDB数据页结构">InnoDB数据页结构</a> 这两篇文章的基础上的。<br>同时，对于B+树的基础知识请自行Google，或者可以看看JULY这篇文章 <a href="https://blog.csdn.net/peterchan88/article/details/52248714" target="_blank" rel="external">https://blog.csdn.net/peterchan88/article/details/52248714</a> 讲的很详细。</p>
 <a id="more"></a>
 <h1 id="前戏"><a href="#前戏" class="headerlink" title="前戏"></a>前戏</h1><p>我们先建立一个表：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">mysql&gt; CREATE TABLE index_demo(</div><div class="line">    -&gt;     c1 INT,</div><div class="line">    -&gt;     c2 INT,</div><div class="line">    -&gt;     c3 CHAR(1),</div><div class="line">    -&gt;     PRIMARY KEY(c1)</div><div class="line">    -&gt; ) ROW_FORMAT = Compact;</div><div class="line">Query OK, 0 rows affected (0.03 sec)</div><div class="line">mysql&gt;</div></pre></td></tr></table></figure>
@@ -476,7 +476,44 @@
 <li>接着删除原表。</li>
 <li>最后把临时表重命名为原来的表名。</li>
 </ol>
-<p>可以发现，若用户对于一张大表进行索引的添加和删除操作，那么这会需要很长的时间。更关键的是，若有大量事务需要访问正在被修改的表，这意味着数据库服务不可用。</p>
+<p>可以发现，若用户对于一张大表进行索引的添加和删除操作，那么这会需要很长的时间。更关键的是，若有大量事务需要访问正在被修改的表，这意味着数据库服务不可用。<br>InnoDB从1.0.x版本开始开始支持一种称为Fast Index Creation(快速索引创建)的索引创建方式-简称FIC.<br>对于辅助索引的创建，InnoDB会对创建索引的表加上一个S锁。在创建的过程中，不需要重建表，因此速度较之前提高很多，并且数据库可用性也得到了提高。删除辅助索引就更简单了，InnoDB只需要更新内部视图，并将辅助索引的空间标记为可用，同时删除MySQL数据库内部视图上对该表的索引定义即可。<br>由于FIC在索引的创建过程中对表加上了S锁，因此在创建过程中，只能对该表进行读操作，若有大量的事务需要对目标进行写操作，那么数据库服务同样不可用。此外FIC方式只限定于<strong>辅助索引</strong>，对于主键的创建和删除同样需要重建一张表。</p>
+<h2 id="Online-DDL"><a href="#Online-DDL" class="headerlink" title="Online DDL"></a>Online DDL</h2><p>虽然FIC可以让InnoDB避免创建临时表，从而提高索引创建的效率。但索引的创建会阻塞表上的DDL操作。MySQL5.6开始支持Online DDL操作，期允许辅助索引创建的同时，还允许其他诸如INSERT,UPDATE,DELETE这类DML操作，这极大的提高了MySQL数据库在生产环境中的可用性。<br>此外，不仅仅是辅助索引，以下这几类的DDL操作都可以通过“在线”的方式进行操作：</p>
+<ul>
+<li>辅助索引的创建和删除</li>
+<li>改变自增长值</li>
+<li>添加或者删除外键约束</li>
+<li>列的重命名</li>
+</ul>
+<p>通过新的ALTER TABLE语法，用户可以选择索引的创建方式：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name</div><div class="line">| <span class="keyword">ADD</span> &#123;<span class="keyword">INDEX</span> | <span class="keyword">KEY</span>&#125; [index_name]</div><div class="line">[index_type] （index_col_name,…）[index_option] ...</div><div class="line">ALGORITHM [=] &#123;<span class="keyword">DEFAULT</span> |INPLACE |COPY&#125;</div><div class="line"><span class="keyword">LOCK</span> [=] &#123;<span class="keyword">DEFAULT</span>|<span class="keyword">NONE</span>|<span class="keyword">SHARED</span>|EXCLUSIVE&#125;</div></pre></td></tr></table></figure>
+<p>ALGORITHM指定了创建或者删除索引的算法，COPY代表创建临时表的方式；INPLACE代表创建或者删除索引不需要创建临时表。DEFAULT表示根据参数 old_alter_table来判断是通过INPLACE还是COPY的算法，该参数默认值为OFF，表示采用INPLACE方式。<br>LOCK部分为算因创建或者删除是对表添加的锁的情况，可选择的有：</p>
+<ol>
+<li>NONE:执行索引或者删除操作时，对目标表不添加任何的锁。即事务任然可以进行读操作。不会收到阻塞。该模式可以获得最大程度的并发。</li>
+<li>SHARE:对目标表添加S锁，对于并发读事务，依然可以执行，但是遇到写事务，就会等待。</li>
+<li>EXCLUSIVE:对目标表添加一个X锁。读写事务都不能进行，因此会阻塞所有的线程，这和COPY方式状态类似，只是不需要创建临时表</li>
+<li>DEFAULT:该模式会首先判断当前操作是否可以使用NONE，若不能，则判断是否可以用SHARE模式，最后判断是否可以使用EXCLUSIVE模式。也就是说该模式下会通过判断事务的最大并发性判断执行DDL的模式。</li>
+</ol>
+<p>InnoDB实现Online DDL的原理是在执行创建或者删除操作的同时，将INSERT,UPDATE,DELETE这类DML造作日志写入到一个缓存中，再完成索引的创建后再将这些操作重做到表上，以此达到数据的一致性。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><p>对于InnoDB存储引擎来说，在单个页中查找某条记录分为两种情况：</p>
+<ul>
+<li>以主键为搜索条件，可以使用Page Directory通过二分法快速定位相应的用户记录。</li>
+<li>以其他列为搜索条件，需要按照记录组成的单链表依次遍历各条记录。</li>
+</ul>
+</li>
+<li><p>没有索引的情况下，不论是以主键还是其他列作为搜索条件，只能沿着页的双链表从左到右依次遍历各个页。</p>
+</li>
+<li><p>InnoDB存储引擎的索引是一棵B+树，完整的用户记录都存储在B+树第0层的叶子节点，其他层次的节点都属于内节点，内节点里存储的是目录项记录。InnoDB的索引分为两大种：</p>
+<ul>
+<li>聚簇索引: 以主键值的大小为页和记录的排序规则，在叶子节点处存储的记录包含了表中所有的列。</li>
+<li>辅助索引: 以自定义的列的大小为页和记录的排序规则，在叶子节点处存储的记录内容是列 + 主键。</li>
+</ul>
+</li>
+<li><p>数据库中B+树的分裂是由PAGE_HEADER中的PAGE_LAST_INSERT，PAGE_DIRECTION，PAGE_N_DIRECTION这三个字段决定的。</p>
+</li>
+<li><p>MySQL5.5之前创建删除索引只能通过新建临时表的方式进行；InnoDB 1.0.x之后开始支持FIC方式创建和删除辅助索引，在该模式下不需要创建临时表，而是在表上添加S锁。从而提高性能；在MySQL5.6之后开始支持Online DDL ,该模式下会将INSERT,UPDATE,DELETE这类DML造作日志写入到一个缓存中，再完成索引的创建后再将这些操作重做到表上，以此达到数据的一致性，从而进一步提升了数据库性能。</p>
+</li>
+</ol>
 
       
     </div>
@@ -522,6 +559,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/15/MySQL索引的使用/" rel="prev" title="MySQL索引的使用">
+                MySQL索引的使用 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -593,7 +634,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-count">13</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -666,7 +707,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前戏"><span class="nav-number">2.</span> <span class="nav-text">前戏</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#聚簇索引"><span class="nav-number">3.</span> <span class="nav-text">聚簇索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#辅助索引"><span class="nav-number">4.</span> <span class="nav-text">辅助索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#联合索引"><span class="nav-number">5.</span> <span class="nav-text">联合索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#B-树索引的分裂"><span class="nav-number">6.</span> <span class="nav-text">B+树索引的分裂</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引管理"><span class="nav-number">7.</span> <span class="nav-text">索引管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Fast-Index-Creation"><span class="nav-number">7.1.</span> <span class="nav-text">Fast Index Creation</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前戏"><span class="nav-number">2.</span> <span class="nav-text">前戏</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#聚簇索引"><span class="nav-number">3.</span> <span class="nav-text">聚簇索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#辅助索引"><span class="nav-number">4.</span> <span class="nav-text">辅助索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#联合索引"><span class="nav-number">5.</span> <span class="nav-text">联合索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#B-树索引的分裂"><span class="nav-number">6.</span> <span class="nav-text">B+树索引的分裂</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引管理"><span class="nav-number">7.</span> <span class="nav-text">索引管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Fast-Index-Creation"><span class="nav-number">7.1.</span> <span class="nav-text">Fast Index Creation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Online-DDL"><span class="nav-number">7.2.</span> <span class="nav-text">Online DDL</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
