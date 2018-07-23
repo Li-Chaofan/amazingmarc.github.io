@@ -1,0 +1,739 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java, Meituan" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="题目给定一个升序排列的自然数数组，数组中包含重复数字，例如：[1,2,2,3,4,4,4,5,6,7,7]。问题：给定任意自然数，对数组进行二分查找，返回数组正确的位置，给出函数实现。注：连续相同的数字，返回第一个匹配位置还是最后一个匹配位置，由函数传入参数决定。本文中我们讨论这样一个“看起来简单”的二分算法需要注意的东西？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="InnoDB中的二分查找">
+<meta property="og:url" content="http://yoursite.com/2017/07/23/InnoDB中的二分查找/index.html">
+<meta property="og:site_name" content="LiChaofan">
+<meta property="og:description" content="题目给定一个升序排列的自然数数组，数组中包含重复数字，例如：[1,2,2,3,4,4,4,5,6,7,7]。问题：给定任意自然数，对数组进行二分查找，返回数组正确的位置，给出函数实现。注：连续相同的数字，返回第一个匹配位置还是最后一个匹配位置，由函数传入参数决定。本文中我们讨论这样一个“看起来简单”的二分算法需要注意的东西？">
+<meta property="og:updated_time" content="2018-07-23T02:21:07.262Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="InnoDB中的二分查找">
+<meta name="twitter:description" content="题目给定一个升序排列的自然数数组，数组中包含重复数字，例如：[1,2,2,3,4,4,4,5,6,7,7]。问题：给定任意自然数，对数组进行二分查找，返回数组正确的位置，给出函数实现。注：连续相同的数字，返回第一个匹配位置还是最后一个匹配位置，由函数传入参数决定。本文中我们讨论这样一个“看起来简单”的二分算法需要注意的东西？">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"right","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/07/23/InnoDB中的二分查找/"/>
+
+
+
+
+
+  <title> InnoDB中的二分查找 | LiChaofan </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LiChaofan</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/23/InnoDB中的二分查找/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LiChaofan">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                InnoDB中的二分查找
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-23T10:13:00+08:00">
+                2017-07-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>给定一个升序排列的自然数数组，数组中包含重复数字，例如：[1,2,2,3,4,4,4,5,6,7,7]。问题：给定任意自然数，对数组进行二分查找，返回数组正确的位置，给出函数实现。注：连续相同的数字，返回第一个匹配位置还是最后一个匹配位置，由函数传入参数决定。<br>本文中我们讨论这样一个“看起来简单”的二分算法需要注意的东西？</p>
+<a id="more"></a>
+<h1 id="二分查找在数据库内核实现中非常重要"><a href="#二分查找在数据库内核实现中非常重要" class="headerlink" title="二分查找在数据库内核实现中非常重要"></a>二分查找在数据库内核实现中非常重要</h1><p>在数据库的内核实现中，二分查找是一个非常重要的逻辑，几乎99%以上的SQL语句(所有索引上的范围扫描/等值查询/Unique查询等)，都会使用到二分查找进行数据的定位。</p>
+<p>考虑一个数据库表t1(a int primary key, b int)，表上的b字段有一个B+树索引，表中记录的b字段取值，就是题目中的[1,2,2,3,4,4,4,5,6,7,7]序列。此时，给定以下的两条查询语句，就是使用到了不同的二分查找逻辑：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">SQL1：   <span class="keyword">select</span> * <span class="keyword">from</span> t1 <span class="keyword">where</span> b &gt; <span class="number">4</span>;</div><div class="line">SQL2： <span class="keyword">select</span> * <span class="keyword">from</span> t1 <span class="keyword">where</span> b &gt;= <span class="number">4</span>;</div></pre></td></tr></table></figure></p>
+<p>针对SQL1，索引的二分查找，就需要跳过所有的4，从最后一个4之后开始返回所有记录；针对SQL2，二分查找就需要定位到第一个4，然后顺序读取所有记录。<br>除此之外，针对数据库中其他的查询逻辑，二分查找还需要附带更多的功能，例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">SQL3： <span class="keyword">select</span> * <span class="keyword">from</span> t1 <span class="keyword">where</span> b &lt; <span class="number">2</span>;</div><div class="line">SQL4： <span class="keyword">select</span> * <span class="keyword">from</span> t1 <span class="keyword">where</span> b &lt;= <span class="number">2</span>;</div></pre></td></tr></table></figure></p>
+<p>由于数据库索引同时支持反向扫描，因此SQL3、SQL4的语句，都可以使用索引反向扫描。反向扫描时，SQL3需要定位到索引中的第一个2；而SQL4，则需要定位到索引的最后一个2，然后开始反向返回满足查询条件的索引记录。</p>
+<p>第一个真正正确的二分查找算法，在第一个二分查找实现之后的12年，才被发表出来。通过Google，输入Binary Search或者是二分查找关键字，有大量的相关的文章或者博客讨论此话题。</p>
+<h1 id="二分查找实现，需要注意的问题"><a href="#二分查找实现，需要注意的问题" class="headerlink" title="二分查找实现，需要注意的问题"></a>二分查找实现，需要注意的问题</h1><p>本文不准备详细介绍一个正确的二分查找应该是如何实现的，毕竟现在网上有着大量的正确版本。接下来，根据批改试卷过程中发现的一些问题，做一些简单的分析，希望对大家实现一个有效的二分查找算法，甚至是一个数据库内可用的二分查找算法，有所帮助。</p>
+<h2 id="问题一：是否检查参数的有效性"><a href="#问题一：是否检查参数的有效性" class="headerlink" title="问题一：是否检查参数的有效性"></a>问题一：是否检查参数的有效性</h2><p> 大量的试卷，在给出此问题的解决算法时，直接拿着low，high参数开始进行计算，但是却没有检查low/high参数。low/high是否相同，数组中是否存在记录？low/high构成的区间是否有效？代码的鲁棒性不足。<br>在数据库的二分查找实现中，一般是对一个索引页面进行二分查找。索引页面中有可能根本不存在用户的记录(索引页面中的记录全部被删除，又没有与兄弟页面合并时)，此时，low/high均为0，此时如果根据low/high计算出来的mid进行记录的读取，就存在逻辑错误。</p>
+<h2 id="问题二：二分查找中值的计算"><a href="#问题二：二分查找中值的计算" class="headerlink" title="问题二：二分查找中值的计算"></a>问题二：二分查找中值的计算</h2><p>这是一个经典的话题，如何计算二分查找中的中值？试卷中，大家一般给出了两种计算方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">算法一： mid = (low + high) / 2</div><div class="line">算法二： mid = low + (high – low)/2</div></pre></td></tr></table></figure>
+<p>乍看起来，算法一简洁，算法二提取之后，跟算法一没有什么区别。但是实际上，区别是存在的。算法一的做法，在极端情况下，(low + high)存在着溢出的风险，进而得到错误的mid结果，导致程序错误。而算法二能够保证计算出来的mid，一定大于low，小于high，不存在溢出的问题。<br>回到数据库二分查找，数据库的一个索引页面(大小一般是8k或者是16k)，能够存储的索引记录是有限的，因此肯定不会出现(low + high)溢出的风险。这也是为什么InnoDB中的中值，采用的就是算法一的实现。但是，作为一个严谨的程序设计人员，还是推荐使用算法二，将任何潜在的风险，扼杀于摇篮之中。</p>
+<h2 id="问题三：递归实现二分查找"><a href="#问题三：递归实现二分查找" class="headerlink" title="问题三：递归实现二分查找"></a>问题三：递归实现二分查找</h2><p>超过一半的试卷，使用了递归调用的方式实现二分查找。不能说递归实现有错，而是在于实现效率问题。众所周知，递归调用存在着压栈/出栈的开销，其效率是比较低下的。而以数据库这样一个极端优化代码效率，提供快速查询响应的系统来说，效率是第一位的。不建议使用递归方式实现二分查找，至少在数据库内核实现中是不允许使用的。据我所知，所有的开源数据库系统，例如：InnoDB，PostgreSQL都未采用递归方式实现二分查找。</p>
+<h2 id="问题四：如何查找第一个-最后一个等值"><a href="#问题四：如何查找第一个-最后一个等值" class="headerlink" title="问题四：如何查找第一个/最后一个等值"></a>问题四：如何查找第一个/最后一个等值</h2><p>回到题目，要求根据传入的参数不同，返回第一个/最后一个等值项。在本文的背景部分，我也解释了此问题对应的数据库查询(&gt;，&gt;=查询需求是不同的)。在试卷中，超过80%的同学的答案都是先进行二分查找，待定位到相同值之后，再根据传入的flag(用户需求：flag = 1，返回第一个等值项；flag = 0，返回最后一个等值项)，进行顺序遍历，直至定位到满足条件的项。</p>
+<p>同样，不能说这个实现是错的，但是也存在着性能问题。性能性能性能，永远是数据库内核实现考虑的重点之一(相信也是所有应用程序的一个指标)。数据库中，除了主键索引/Unique索引能够保证键值唯一之外，很多二级辅助索引都是存在相同键值的，有时相同键值的项会超过千项(考虑一个用户的订单，或者是购买记录)。</p>
+<p>假设一个索引页面，保存着400项记录，均为相同键值。此时，使用先二分查找，后顺序遍历的算法，二分查找只能使用一次，顺序遍历199次，最终对比了200次。效率非常之低。当然，我也欣喜的看到另外一小部分同学的做法(我期待看到的算法)，用flag来纠正每次比较的最终结果。例如：比较相等(相等用0表示，大于为1，小于为-1)，但是flag = 1，则返回纠正后的比较结果为1，需要移动二分查找的high到mid，继续二分(反之，若flag = 0，则返回纠正后的结果为-1，需要移动二分查找的low到mid，继续二分)。如此一来，等值仍旧可以进行二分查找，最终的对比只需要9次，远远小于200次。</p>
+<p>此问题，进一步引出了下一个问题，数据库中如何实现一个通用的，更为复杂的二分查找算法？</p>
+<h2 id="问题五：数据库中的二分查找实现举例"><a href="#问题五：数据库中的二分查找实现举例" class="headerlink" title="问题五：数据库中的二分查找实现举例"></a>问题五：数据库中的二分查找实现举例</h2><p>数据库中的二分查找，更为复杂，需要实现一个通用型的二分查找算法，使用于各种不同的SQL查询场景。</p>
+<p>InnoDB针对不同的SQL语句，总结出四种不同的Search Mode，分别为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#define    PAGE_CUR_G          1        &gt;查询</div><div class="line">#define    PAGE_CUR_GE         2        &gt;=，=查询</div><div class="line">#define    PAGE_CUR_L          3        &lt;查询</div><div class="line">#define    PAGE_CUR_LE         4        &lt;=查询</div></pre></td></tr></table></figure>
+<p>然后根据这四种不同的Search Mode，在二分查找碰到相同键值时进行调整。例如：若Search Mode为PAGE_CUR_G或者是PAGE_CUR_LE，则移动low至mid，继续进行二分查找；若Search Mode为PAGE_CUR_GE或者是PAGE_CUR_L，则移动high至mid，继续进行二分查找。</p>
+<h1 id="java实现二分算法"><a href="#java实现二分算法" class="headerlink" title="java实现二分算法"></a>java实现二分算法</h1>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/15/MySQL索引的使用/" rel="next" title="MySQL索引的使用">
+                <i class="fa fa-chevron-left"></i> MySQL索引的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/lufei.jpg"
+               alt="marc" />
+          <p class="site-author-name" itemprop="name">marc</p>
+           
+              <p class="site-description motion-element" itemprop="description">Keep on going</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/amazingmarc" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://tech.meituan.com/" title="美团技术博客" target="_blank">美团技术博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://blog.csdn.net/v_JULY_v" title="v_JULY_v" target="_blank">v_JULY_v</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二分查找在数据库内核实现中非常重要"><span class="nav-number">2.</span> <span class="nav-text">二分查找在数据库内核实现中非常重要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二分查找实现，需要注意的问题"><span class="nav-number">3.</span> <span class="nav-text">二分查找实现，需要注意的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题一：是否检查参数的有效性"><span class="nav-number">3.1.</span> <span class="nav-text">问题一：是否检查参数的有效性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题二：二分查找中值的计算"><span class="nav-number">3.2.</span> <span class="nav-text">问题二：二分查找中值的计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题三：递归实现二分查找"><span class="nav-number">3.3.</span> <span class="nav-text">问题三：递归实现二分查找</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题四：如何查找第一个-最后一个等值"><span class="nav-number">3.4.</span> <span class="nav-text">问题四：如何查找第一个/最后一个等值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题五：数据库中的二分查找实现举例"><span class="nav-number">3.5.</span> <span class="nav-text">问题五：数据库中的二分查找实现举例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#java实现二分算法"><span class="nav-number">4.</span> <span class="nav-text">java实现二分算法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">marc</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
