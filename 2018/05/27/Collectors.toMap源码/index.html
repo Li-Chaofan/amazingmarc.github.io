@@ -91,11 +91,11 @@
 注意：最好先看一下Collector接口 这篇文章才能更好理解这篇文章。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Collectors.toMap解析">
-<meta property="og:url" content="http://yoursite.com/2017/05/27/Collectors.toMap源码/index.html">
+<meta property="og:url" content="http://yoursite.com/2018/05/27/Collectors.toMap源码/index.html">
 <meta property="og:site_name" content="李超凡的boke">
 <meta property="og:description" content="在使用Stream时，经常会有将一个list转换为一个map的场景，这时会用到Collectors.toMap方法，这篇文章中我们详细介绍一下toMap方法以及使用该方法的几个注意点。最后我们自己实现了Collectors接口来定义了自己的toMapCollector。
 注意：最好先看一下Collector接口 这篇文章才能更好理解这篇文章。">
-<meta property="og:updated_time" content="2018-05-27T11:32:57.476Z">
+<meta property="og:updated_time" content="2018-07-24T16:54:07.250Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Collectors.toMap解析">
 <meta name="twitter:description" content="在使用Stream时，经常会有将一个list转换为一个map的场景，这时会用到Collectors.toMap方法，这篇文章中我们详细介绍一下toMap方法以及使用该方法的几个注意点。最后我们自己实现了Collectors接口来定义了自己的toMapCollector。
@@ -127,7 +127,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/05/27/Collectors.toMap源码/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/05/27/Collectors.toMap源码/"/>
 
 
 
@@ -262,7 +262,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/27/Collectors.toMap源码/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/27/Collectors.toMap源码/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -298,8 +298,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-27T19:19:00+08:00">
-                2017-05-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-27T19:19:00+08:00">
+                2018-05-27
               </time>
             
 
@@ -357,7 +357,7 @@
 
       
         <p>在使用Stream时，经常会有将一个list转换为一个map的场景，这时会用到Collectors.toMap方法，这篇文章中我们详细介绍一下toMap方法以及使用该方法的几个注意点。最后我们自己实现了Collectors接口来定义了自己的toMapCollector。</p>
-<p>注意：最好先看一下<a href="/2017/05/27/Collector接口/" title="Collector接口">Collector接口</a> 这篇文章才能更好理解这篇文章。</p>
+<p>注意：最好先看一下<a href="/2018/05/27/Collector接口/" title="Collector接口">Collector接口</a> 这篇文章才能更好理解这篇文章。</p>
 <a id="more"></a>
 <p>首先我们定义如下类：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Member</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">long</span> id;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> type;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.id = id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getType</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> type;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setType</span><span class="params">(<span class="keyword">int</span> type)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.type = type;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -373,7 +373,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">BinaryOperator&lt;T&gt; <span class="title">throwingMerger</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> (u,v) -&gt; &#123; <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(String.format(<span class="string">"Duplicate key %s"</span>, u)); &#125;;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 <p>我们继续看四个参数的toMap方法中的实现，首先我们先看return语句，该方法返回的是一个CollectorImpl类，该类是一个Collector接口的实现，该类定义如下（在Collectors接口中进行了定义）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CollectorImpl</span>&lt;<span class="title">T</span>, <span class="title">A</span>, <span class="title">R</span>&gt; <span class="keyword">implements</span> <span class="title">Collector</span>&lt;<span class="title">T</span>, <span class="title">A</span>, <span class="title">R</span>&gt; </span>&#123;</div><div class="line">     <span class="keyword">private</span> <span class="keyword">final</span> Supplier&lt;A&gt; supplier;</div><div class="line">     <span class="keyword">private</span> <span class="keyword">final</span> BiConsumer&lt;A, T&gt; accumulator;</div><div class="line">     <span class="keyword">private</span> <span class="keyword">final</span> BinaryOperator&lt;A&gt; combiner;</div><div class="line">     <span class="keyword">private</span> <span class="keyword">final</span> Function&lt;A, R&gt; finisher;</div><div class="line">     <span class="keyword">private</span> <span class="keyword">final</span> Set&lt;Characteristics&gt; characteristics;</div><div class="line"></div><div class="line">     CollectorImpl(Supplier&lt;A&gt; supplier,</div><div class="line">                   BiConsumer&lt;A, T&gt; accumulator,</div><div class="line">                   BinaryOperator&lt;A&gt; combiner,</div><div class="line">                   Function&lt;A,R&gt; finisher,</div><div class="line">                   Set&lt;Characteristics&gt; characteristics) &#123;</div><div class="line">         <span class="keyword">this</span>.supplier = supplier;</div><div class="line">         <span class="keyword">this</span>.accumulator = accumulator;</div><div class="line">         <span class="keyword">this</span>.combiner = combiner;</div><div class="line">         <span class="keyword">this</span>.finisher = finisher;</div><div class="line">         <span class="keyword">this</span>.characteristics = characteristics;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     CollectorImpl(Supplier&lt;A&gt; supplier,</div><div class="line">                   BiConsumer&lt;A, T&gt; accumulator,</div><div class="line">                   BinaryOperator&lt;A&gt; combiner,</div><div class="line">                   Set&lt;Characteristics&gt; characteristics) &#123;</div><div class="line">         <span class="keyword">this</span>(supplier, accumulator, combiner, castingIdentity(), characteristics);</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     <span class="comment">//省去getter方法</span></div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<p>可以看到其实就是指定Colector接口中相应的 supplier,accumulator,combiner,finisher,和characteristics （详细可看<a href="/2017/05/27/Collector接口/" title="Collector接口">Collector接口</a> ）;</p>
+<p>可以看到其实就是指定Colector接口中相应的 supplier,accumulator,combiner,finisher,和characteristics （详细可看<a href="/2018/05/27/Collector接口/" title="Collector接口">Collector接口</a> ）;</p>
 <p>对应到两个方法的toMap方法，构造的CollectorImpl参数如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">supplier = HashMap::<span class="keyword">new</span></div><div class="line"></div><div class="line"><span class="comment">//“累加器”，一会儿详细说</span></div><div class="line">accumulator = (map, element) -&gt; map.merge(keyMapper.apply(element),valueMapper.apply(element), mergeFunction);</div><div class="line"></div><div class="line"><span class="comment">//这里的mergeFunction就是上面说的throwingMerger方法</span></div><div class="line">combiner = mapMerger(mergeFunction)</div><div class="line"><span class="comment">//将第二个map中的key，value merge到m1中 </span></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> &lt;K, V, M extends Map&lt;K,V&gt;&gt;</div><div class="line">   <span class="function">BinaryOperator&lt;M&gt; <span class="title">mapMerger</span><span class="params">(BinaryOperator&lt;V&gt; mergeFunction)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> (m1, m2) -&gt; &#123;</div><div class="line">            <span class="keyword">for</span> (Map.Entry&lt;K,V&gt; e : m2.entrySet())</div><div class="line">                m1.merge(e.getKey(), e.getValue(), mergeFunction);</div><div class="line">            <span class="keyword">return</span> m1;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">characteristics = CH_ID (一个集合常量只包含 Collector.Characteristics.IDENTITY_FINISH)</div><div class="line"></div><div class="line">finisher = castingIdentity（）方法</div><div class="line"> <span class="keyword">private</span> <span class="keyword">static</span> &lt;I, R&gt; <span class="function">Function&lt;I, R&gt; <span class="title">castingIdentity</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> i -&gt; (R) i;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 <p>我们重点看一下accumulator（accumulator是一个“累加器”）：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">BiConsumer&lt;M, T&gt; accumulator</div><div class="line">                = (map, element) -&gt; map.merge(keyMapper.apply(element),</div><div class="line">                                              valueMapper.apply(element), mergeFunction);</div></pre></td></tr></table></figure>
@@ -453,7 +453,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/27/Collector接口/" rel="next" title="Collector接口">
+              <a href="/2018/05/27/Collector接口/" rel="next" title="Collector接口">
                 <i class="fa fa-chevron-left"></i> Collector接口
               </a>
             
@@ -463,7 +463,7 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/05/27/java8的几个主要函数接口/" rel="prev" title="java8的几个主要函数接口">
+              <a href="/2018/05/27/java8的几个主要函数接口/" rel="prev" title="java8的几个主要函数接口">
                 java8的几个主要函数接口 <i class="fa fa-chevron-right"></i>
               </a>
             
