@@ -93,7 +93,7 @@
 <meta property="og:url" content="http://yoursite.com/2018/07/25/重现Insert死锁问题/index.html">
 <meta property="og:site_name" content="李超凡的boke">
 <meta property="og:description" content="概述InnoDB 进行insert操作插入唯一索引（当然包括主键）在某种情况下会产生死锁。mysql官方文档中也对insert操作会产生死锁的情况进行了说明。本文只是在官方文档的基础上重现了死锁发生的情况。建议自己看一下官方文档：https://dev.mysql.com/doc/refman/5.7/en/innodb-locks-set.html">
-<meta property="og:updated_time" content="2018-07-24T16:49:12.232Z">
+<meta property="og:updated_time" content="2018-07-25T07:12:52.930Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="重现Insert死锁问题">
 <meta name="twitter:description" content="概述InnoDB 进行insert操作插入唯一索引（当然包括主键）在某种情况下会产生死锁。mysql官方文档中也对insert操作会产生死锁的情况进行了说明。本文只是在官方文档的基础上重现了死锁发生的情况。建议自己看一下官方文档：https://dev.mysql.com/doc/refman/5.7/en/innodb-locks-set.html">
@@ -386,6 +386,7 @@
 <p>The first operation by session 1 acquires an exclusive lock for the row. The operations by sessions 2 and 3 both result in a duplicate-key error and they both request a shared lock for the row. When session 1 commits, it releases its exclusive lock on the row and the queued shared lock requests for sessions 2 and 3 are granted. At this point, sessions 2 and 3 deadlock: Neither can acquire an exclusive lock for the row because of the shared lock held by the other.</p>
 </blockquote>
 <p>还注意到，在发生死锁之后，会根据某种算法决定回滚其中一个事务，可以看到是将事务3回滚了，事务2即显示插入成功了。</p>
+<p>注意，本文只复现了删除操作，其实如果事务1也是INSERT 然后回滚的话也会造成死锁。</p>
 <h1 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h1><p><a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-locks-set.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.7/en/innodb-locks-set.html</a></p>
 
       
@@ -432,6 +433,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/25/InnoDB中的锁/" rel="prev" title="InnoDB中的锁">
+                InnoDB中的锁 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -503,7 +508,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
