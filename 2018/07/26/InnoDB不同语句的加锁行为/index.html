@@ -87,16 +87,19 @@
 
 
 
-<meta name="description" content="Keep on going">
+<meta name="description" content="锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。
+如果在查询中使用了辅助索引，并且要设置的索引记录的">
 <meta property="og:type" content="article">
-<meta property="og:title" content="postName">
-<meta property="og:url" content="http://yoursite.com/2017/03/27/postName/index.html">
+<meta property="og:title" content="InnoDB不同语句的加锁行为">
+<meta property="og:url" content="http://yoursite.com/2018/07/26/InnoDB不同语句的加锁行为/index.html">
 <meta property="og:site_name" content="李超凡的boke">
-<meta property="og:description" content="Keep on going">
-<meta property="og:updated_time" content="2017-03-27T09:02:04.000Z">
+<meta property="og:description" content="锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。
+如果在查询中使用了辅助索引，并且要设置的索引记录的">
+<meta property="og:updated_time" content="2018-07-26T01:19:27.126Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="postName">
-<meta name="twitter:description" content="Keep on going">
+<meta name="twitter:title" content="InnoDB不同语句的加锁行为">
+<meta name="twitter:description" content="锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。
+如果在查询中使用了辅助索引，并且要设置的索引记录的">
 
 
 
@@ -124,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/03/27/postName/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/07/26/InnoDB不同语句的加锁行为/"/>
 
 
 
 
 
-  <title> postName | 李超凡的boke </title>
+  <title> InnoDB不同语句的加锁行为 | 李超凡的boke </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -259,7 +262,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/27/postName/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/26/InnoDB不同语句的加锁行为/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -280,7 +283,7 @@
             
             
               
-                postName
+                InnoDB不同语句的加锁行为
               
             
           </h1>
@@ -295,8 +298,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-27T17:02:04+08:00">
-                2017-03-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-26T08:06:00+08:00">
+                2018-07-26
               </time>
             
 
@@ -305,6 +308,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -331,7 +356,27 @@
       
 
       
-        
+        <p>锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。</p>
+<p>如果在查询中使用了辅助索引，并且要设置的索引记录的锁是X Lock，InnoDB还会检索相应的聚簇索引记录并对它们加锁。</p>
+<p>如果你的查询语句没有适合的索引，MySQL必须扫描整个表来处理语句，表的每一行都会被锁定（但注意这不是表锁），这反过来会阻止其他事务对表的所有插入。 创建好的索引非常重要，这样您的查询就不会扫描很不必要地行。</p>
+<p>本文我们介绍不同的SQL语句的加锁情况：<br><a id="more"></a></p>
+<p><strong>SELECT … FROM</strong> 是一致性非锁定读，也就是读的数据快照，因此不需要加锁。但是在事务隔离级别为SERIALIZABLE的时候还是要加锁的，在事务隔离级别为SERIALIZABLE的情况下，会对索引记录加next-key locks 不过当使用唯一索引查询有唯一属性的列的时候next-key locks会降级为record lock.</p>
+<p><strong>SELECT … FOR UPDATE or SELECT … LOCK IN SHARE MODE</strong> 会对扫描的索引记录加锁，并且一般情况下，对于不满足查询条件的记录（WHERE 语句中的条件）会立即释放锁。然而在某些情况下，并不会立即释放不满足条件的行记录的锁。比如在UNION中，在MySQL评判是否满足WHERE条件之前会把所有扫描的记录会插入到一个临时表中，这样，只有在查询结束的时候才能释放锁（满足条件或者不满足条件的的行记录对应的锁）。而不是在扫描的过程中就释放不满足条件的记录锁。</p>
+<p>总之，向UNION这种情况，是等所有表的相关数据都拿到之后才能判断是否满足最终WHERE条件，所以在获取每个表中的记录时无法判断该语句是否最终满足条件，因此是会一直锁定的。</p>
+<p><strong>SELECT … LOCK IN SHARE MODE </strong> 会在查询的索引记录上加 shared next-key locks。同样，对于使用唯一索引查询具有唯一属性的查询会降级为record lock.</p>
+<p><strong>SELECT … FOR UPDATE</strong> 会在查询的索引记录上加 exclusive next-key locks。同样，对于使用唯一索引查询具有唯一属性的查询会降级为record lock.<br>注意：SELECT … FOR UPDATE因为加的是X Lock 所以会阻塞其他事务对于相应记录（以及间隙）的更新或者删除操作，以及 SELECT … LOCK IN SHARE MODE 模式的读操作。而一致性非锁定读不会受记录上任何锁的影响</p>
+<p><strong>UPDATE … WHERE … </strong> 会在查询的索引记录上加 exclusive next-key locks。同样，对于使用唯一索引查询具有唯一属性的查询会降级为record lock.<br>当UPDATE修改聚簇索引记录时，将对受影响的辅助索引记录采用隐式锁定。 在插入新的辅助索引记录之前执行duplicate check时, 以及插入新的辅助索引记录时, 更新操作还会对受影响的辅助索引记录加上S Lock。</p>
+<p><strong>DELETE FROM … WHERE …</strong> 会在查询的索引记录上加 exclusive next-key locks。同样，对于使用唯一索引查询具有唯一属性的查询会降级为record lock.</p>
+<p><strong>INSERT </strong> INSERT在插入的行上设置独占锁。此锁是索引记录锁，而不是next-key locks（即没有间隙锁），并且不会阻止其他事务在插入行之之前的间隙进行插入。</p>
+<p>在插入行之前，会设置一种称为插入意向间隙锁insert intention gap lock（间隙锁的一种）。在insert intention gap lock时，加如果插入到相同索引间隙中的多个事务不插入间隙内的相同位置，则不需要等待彼此（但每个事务都会加上 insert intention gap lock）。假设存在值为4和7的索引记录。尝试插入值5和6的两个事务在获取插入行上的独占锁之前使用insert intention gap lock锁定4和7之间的间隙，但因为插入的行是不冲突的，所以不会相互阻塞。</p>
+<p>如果插入过程中发生duplicate-key error，则会对该索引记录上加S Lock。如果有多个事务尝试插入同一行，并且另一个事务已经具有了X Lock，则使用共享锁可能导致死锁。关于这种死锁情况 我在 <a href="/2018/07/25/重现Insert死锁问题/" title="重现Insert死锁问题">重现Insert死锁问题</a> 这篇文章中详细做了说明。</p>
+<p><strong>INSERT … ON DUPLICATE KEY UPDATE</strong> 与淡出的INSERT语句不同的是，当发生duplicate-key error时，会对相应的索引记录加上X Lock,而不是 S Lock。对重复的主键值采用独占索引记录锁定（X Record Lock）。 对于重复的唯一键值，会采用 X next-keylock锁定。</p>
+<p><strong>REPLACE</strong> 如果唯一键上没有冲突，REPLACE就像INSERT一样完成。 否则，在要替换的行上设置 X next-key lock。</p>
+<p><strong>INSERT INTO T SELECT … FROM S WHERE … </strong> 在插入T的每一行上设置一个X Record Lock（without a gap lock）。如果事务隔离级别是READ COMMITTED，或者启用innodb_locks_unsafe_for_binlog并且事务隔离级别 不是SERIALIZABLE，InnoDB将S上的查询作为一致性非锁定读取（无锁）。 否则，InnoDB在查询的S的行上加S next-key locks。</p>
+<p><strong>CREATE TABLE … SELECT …</strong> 与INSERT … SELECT差不多都会对SELECT 操作加S next-key locks或者采取一致性非锁定读。</p>
+<p>对于AUTO_INCREMENT的锁定，<a href="/2018/07/25/InnoDB中的锁/" title="InnoDB中的锁">InnoDB中的锁</a> 里面已经做过介绍，就不再赘述。</p>
+<p>如果在表上定义了FOREIGN KEY约束，则需要检查约束条件的任何插入，更新或删除都会在其查看的记录上设置共享记录级锁定以检查约束。 InnoDB还会在约束失败的情况下设置这些锁。</p>
+
       
     </div>
 
@@ -367,15 +412,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/07/25/InnoDB中的锁/" rel="next" title="InnoDB中的锁">
+                <i class="fa fa-chevron-left"></i> InnoDB中的锁
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/03/27/hello-world/" rel="prev" title="Hello World">
-                Hello World <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
