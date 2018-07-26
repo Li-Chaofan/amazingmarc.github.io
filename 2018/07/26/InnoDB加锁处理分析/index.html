@@ -104,7 +104,7 @@
 <meta property="og:image" content="http://yoursite.com/upload/innodb_lock_analysis_7.png">
 <meta property="og:image" content="http://yoursite.com/upload/innodb_lock_analysis_8.png">
 <meta property="og:image" content="http://yoursite.com/upload/innodb_lock_analysis_9.png">
-<meta property="og:updated_time" content="2018-07-26T16:39:20.378Z">
+<meta property="og:updated_time" content="2018-07-26T17:02:19.886Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="InnoDB加锁处理分析">
 <meta name="twitter:description" content="概述InnoDB的加锁分析，是一个比较困难的话题，也是一个很大很大的话题，本文主要针对InnoDB加锁问题进行分析。现实情况中还有很多很多不同的场景无法一一列举分析，本文主要还是是介绍一种思路，平时对于SQL语句加锁的分析，死锁的分析可以按照这种思路来走。
@@ -435,7 +435,7 @@
 <p><strong>结论</strong>：在Repeatable Read隔离级别下，如果进行全表扫描的当前读，那么会锁上表中的所有记录，同时会锁上聚簇索引内的所有GAP，杜绝所有的并发 更新/删除/插入 操作。当然，也可以通过触发semi-consistent read，来缓解加锁开销与并发影响，但是semi-consistent read本身也会带来其他问题，不建议使用。</p>
 <h1 id="一条复杂的SQL的加锁实现分析"><a href="#一条复杂的SQL的加锁实现分析" class="headerlink" title="一条复杂的SQL的加锁实现分析"></a>一条复杂的SQL的加锁实现分析</h1><p>上面说了比较简单的SQL加锁分析，不过已经包含大部分加锁场景了，再来看一个稍微复杂点的SQL，用于说明MySQL加锁的另外一个逻辑。SQL用例如下：<br><img src="/upload/innodb_lock_analysis_8.png" alt="avatar"></p>
 <p>如图中的SQL，会加什么锁？假定在Repeatable Read隔离级别下，同时，假设SQL走的是idx_t1_pu索引。</p>
-<p>在详细分析这条SQL的加锁情况前，还需要有一个知识储备，那就是一个SQL中的where条件如何拆分，这里直接给出结论：</p>
+<p>在详细分析这条SQL的加锁情况前，还需要有一个知识储备，那就是一个SQL中的where条件如何拆分，可以看一下<a href="/2018/07/16/SQL中的where条件提取/" title="SQL中的where条件提取">SQL中的where条件提取</a>，这里直接给出结论：</p>
 <ul>
 <li>Index key：pubtime &gt; 1 and puptime &lt; 20。此条件，用于确定SQL在idx_t1_pu索引上的查询范围。</li>
 <li>Index Filter：userid = ‘hdc’ 。此条件，可以在idx_t1_pu索引上进行过滤，但不属于Index Key。</li>
@@ -445,6 +445,7 @@
 <p>从图中可以看出，在Repeatable Read隔离级别下，由Index Key所确定的范围，被加上了GAP锁；Index Filter锁给定的条件 (userid = ‘hdc’)何时过滤，视MySQL的版本而定，在MySQL 5.6版本之前，不支持Index Condition Pushdown(ICP)，因此Index Filter在MySQL Server层过滤，在5.6后支持了Index Condition Pushdown，则在index上过滤。若不支持ICP，不满足Index Filter的记录，也需要加上记录X锁，若支持ICP，则不满足Index Filter的记录，无需加记录X锁 (图中，用红色箭头标出的X锁，是否要加，视是否支持ICP而定)；而Table Filter对应的过滤条件，则在聚簇索引中读取后，在MySQL Server层面过滤，因此聚簇索引上也需要X锁。最后，选取出了一条满足条件的记录[8,hdc,d,5,good]，但是加锁的数量，要远远大于满足条件的记录数量。</p>
 <p><strong>结论</strong>：在Repeatable Read隔离级别下，针对一个复杂的SQL，首先需要提取其where条件。Index Key确定的范围，需要加上GAP锁；Index Filter过滤条件，视MySQL版本是否支持ICP，若支持ICP，则不满足Index Filter的记录，不加X锁，否则需要X锁；Table Filter过滤条件，无论是否满足，都需要加X锁。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文主要介绍了MVCC以及InnoDB中事务的隔离级别，同时分析了不同场景下SQL语句的加锁情况。但是现实情况仍然要比本文介绍的复杂很多，还是需要具体问题具体分析。就像本文开头说的一样，最重要的是一种分析思路，以后对于加锁的分析都可以按照本文给出的思路来进行分析。</p>
+<p>还有，可以详细看一下这个：<a href="https://segmentfault.com/a/1190000013307132#articleHeader13，其中对于Gap锁具体的加锁范围有比较详细的实验。" target="_blank" rel="external">https://segmentfault.com/a/1190000013307132#articleHeader13，其中对于Gap锁具体的加锁范围有比较详细的实验。</a></p>
 
       
     </div>
@@ -561,7 +562,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
