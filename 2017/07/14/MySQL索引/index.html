@@ -92,7 +92,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL索引">
 <meta property="og:url" content="http://yoursite.com/2017/07/14/MySQL索引/index.html">
-<meta property="og:site_name" content="李超凡的boke">
+<meta property="og:site_name" content="李超凡的读书笔记">
 <meta property="og:description" content="概述InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。
 接下来我们详细介绍一下InnoDB中的索引结构。注意 本文是建立在  innodb记录存">
 <meta property="og:image" content="http://yoursite.com/upload/index_demo1.png">
@@ -142,7 +142,7 @@
 
 
 
-  <title> MySQL索引 | 李超凡的boke </title>
+  <title> MySQL索引 | 李超凡的读书笔记 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -178,7 +178,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">李超凡的boke</span>
+        <span class="site-title">李超凡的读书笔记</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -280,7 +280,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李超凡的boke">
+      <meta itemprop="name" content="李超凡的读书笔记">
     </span>
 
     
@@ -366,7 +366,7 @@
 
       
         <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>InnoDB中索引是由B+树实现的，B+索引在数据库中有一个特点就是高扇出性，因此在数据库中，B+树的高度一般都在2 ~ 4层，这也就是说查找某一键值的行记录时最多只需要2到4次IO，这倒是不错。因为当前一般的机械键盘每秒至少可以做100次IO，2~4次的IO意味着查询时间只需要0.02 ~ 0.04秒。</p>
-<p>接下来我们详细介绍一下InnoDB中的索引结构。<br><strong>注意</strong> 本文是建立在  <a href="/2017/07/11/innodb记录存储结构/" title="innodb记录存储结构">innodb记录存储结构</a> 和  <a href="/2017/07/14/InnoDB数据页结构/" title="InnoDB数据页结构">InnoDB数据页结构</a> 这两篇文章的基础上的。<br>同时，对于B+树的基础知识请自行Google，或者可以看看JULY这篇文章 <a href="https://blog.csdn.net/peterchan88/article/details/52248714" target="_blank" rel="external">https://blog.csdn.net/peterchan88/article/details/52248714</a> 讲的很详细。</p>
+<p>接下来我们详细介绍一下InnoDB中的索引结构。<br><strong>注意</strong> 本文是建立在  <a href="/2018/07/11/innodb记录存储结构/" title="innodb记录存储结构">innodb记录存储结构</a> 和  <a href="/2018/07/14/InnoDB数据页结构/" title="InnoDB数据页结构">InnoDB数据页结构</a> 这两篇文章的基础上的。<br>同时，对于B+树的基础知识请自行Google，或者可以看看JULY这篇文章 <a href="https://blog.csdn.net/peterchan88/article/details/52248714" target="_blank" rel="external">https://blog.csdn.net/peterchan88/article/details/52248714</a> 讲的很详细。</p>
 <a id="more"></a>
 <h1 id="前戏"><a href="#前戏" class="headerlink" title="前戏"></a>前戏</h1><p>我们先建立一个表：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">mysql&gt; CREATE TABLE index_demo(</div><div class="line">    -&gt;     c1 INT,</div><div class="line">    -&gt;     c2 INT,</div><div class="line">    -&gt;     c3 CHAR(1),</div><div class="line">    -&gt;     PRIMARY KEY(c1)</div><div class="line">    -&gt; ) ROW_FORMAT = Compact;</div><div class="line">Query OK, 0 rows affected (0.03 sec)</div><div class="line">mysql&gt;</div></pre></td></tr></table></figure>
@@ -386,7 +386,7 @@
 <p>为了节省篇幅，我们之后的示意图中会把记录的其他信息这个部分省略掉，因为它占地方并且不会有什么观赏效果。另外，为了方便理解，我们觉得把记录竖着放看起来感觉更好，所以将记录格式示意图的其他信息去掉并把它竖起来的效果就是这样：</p>
 <p><img src="/upload/index_demo4.png" alt="avatar"><br>把一些记录放到页里边的示意图就是：</p>
 <p><img src="/upload/index_demo2.png" alt="avatar"></p>
-<p>在  <a href="/2017/07/14/InnoDB数据页结构/" title="InnoDB数据页结构">InnoDB数据页结构</a> 中我们知道，记录在页中是一个单链表的组成，而且是根据主键由小到大排列的，在一个页中查找某个记录可以在 page directory中根据槽做二叉查找从而快速定位记录所在的位置。大部分情况下我们表中存放的记录都是非常多的，需要好多的数据页来存储这些记录。在很多页中查找记录的话可以分为两个步骤：</p>
+<p>在  <a href="/2018/07/14/InnoDB数据页结构/" title="InnoDB数据页结构">InnoDB数据页结构</a> 中我们知道，记录在页中是一个单链表的组成，而且是根据主键由小到大排列的，在一个页中查找某个记录可以在 page directory中根据槽做二叉查找从而快速定位记录所在的位置。大部分情况下我们表中存放的记录都是非常多的，需要好多的数据页来存储这些记录。在很多页中查找记录的话可以分为两个步骤：</p>
 <ol>
 <li>定位到记录所在的页。</li>
 <li>从所在的页内中查找相应的记录。</li>
@@ -644,7 +644,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">18</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
