@@ -91,7 +91,7 @@
 在看本文前，建议先看一下 MySQL索引 和 InnoDB中的锁">
 <meta property="og:type" content="article">
 <meta property="og:title" content="InnoDB加锁处理分析">
-<meta property="og:url" content="http://yoursite.com/2018/07/26/InnoDB加锁处理分析/index.html">
+<meta property="og:url" content="http://yoursite.com/2018/07/27/InnoDB加锁处理分析/index.html">
 <meta property="og:site_name" content="李超凡的读书笔记">
 <meta property="og:description" content="概述InnoDB的加锁分析，是一个比较困难的话题，也是一个很大很大的话题，本文主要针对InnoDB加锁问题进行分析。现实情况中还有很多很多不同的场景无法一一列举分析，本文主要还是是介绍一种思路，平时对于SQL语句加锁的分析，死锁的分析可以按照这种思路来走。
 在看本文前，建议先看一下 MySQL索引 和 InnoDB中的锁">
@@ -104,7 +104,7 @@
 <meta property="og:image" content="http://yoursite.com/upload/innodb_lock_analysis_7.png">
 <meta property="og:image" content="http://yoursite.com/upload/innodb_lock_analysis_8.png">
 <meta property="og:image" content="http://yoursite.com/upload/innodb_lock_analysis_9.png">
-<meta property="og:updated_time" content="2018-07-26T17:02:19.886Z">
+<meta property="og:updated_time" content="2018-07-26T17:05:06.114Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="InnoDB加锁处理分析">
 <meta name="twitter:description" content="概述InnoDB的加锁分析，是一个比较困难的话题，也是一个很大很大的话题，本文主要针对InnoDB加锁问题进行分析。现实情况中还有很多很多不同的场景无法一一列举分析，本文主要还是是介绍一种思路，平时对于SQL语句加锁的分析，死锁的分析可以按照这种思路来走。
@@ -137,7 +137,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/07/26/InnoDB加锁处理分析/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/07/27/InnoDB加锁处理分析/"/>
 
 
 
@@ -272,7 +272,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/26/InnoDB加锁处理分析/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/27/InnoDB加锁处理分析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -308,8 +308,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-26T09:26:00+08:00">
-                2018-07-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-27T01:26:00+08:00">
+                2018-07-27
               </time>
             
 
@@ -367,7 +367,7 @@
 
       
         <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>InnoDB的加锁分析，是一个比较困难的话题，也是一个很大很大的话题，本文主要针对InnoDB加锁问题进行分析。现实情况中还有很多很多不同的场景无法一一列举分析，本文主要还是是介绍一种思路，平时对于SQL语句加锁的分析，死锁的分析可以按照这种思路来走。</p>
-<p>在看本文前，建议先看一下 <a href="/2017/07/14/MySQL索引/" title="MySQL索引">MySQL索引</a> 和 <a href="/2018/07/25/InnoDB中的锁/" title="InnoDB中的锁">InnoDB中的锁</a> </p>
+<p>在看本文前，建议先看一下 <a href="/2018/07/14/MySQL索引/" title="MySQL索引">MySQL索引</a> 和 <a href="/2018/07/25/InnoDB中的锁/" title="InnoDB中的锁">InnoDB中的锁</a> </p>
 <a id="more"></a>
 <h1 id="一致性非锁定读"><a href="#一致性非锁定读" class="headerlink" title="一致性非锁定读"></a>一致性非锁定读</h1><p>一致性非锁定读是指InnoDB通过行多版本控制的方式来读取当前执行时间数据库中行的数据。如果读取的行正在执行DELETE或UPDATE操作，这时读取操作不会因此等待行上的锁释放。相反地，InnoDB会取读取行的一个快照数据。</p>
 <p>之所以称其为非锁定读，因为不需要等待访问行上的X锁的释放。快照数据是指该行的之前版本数据，该实现是通过undo段来完成的。而undo用来在事务中回滚数据。因此，快照本身没有额外的开销。此外，读取快照数据是不需要上锁的，因为没有事务需要对历史的数据进行修改。</p>

@@ -91,7 +91,7 @@
 在看本文前，建议先看一下 innodb记录存储结构">
 <meta property="og:type" content="article">
 <meta property="og:title" content="InnoDB数据页结构">
-<meta property="og:url" content="http://yoursite.com/2018/07/14/InnoDB数据页结构/index.html">
+<meta property="og:url" content="http://yoursite.com/2018/07/11/InnoDB数据页结构/index.html">
 <meta property="og:site_name" content="李超凡的读书笔记">
 <meta property="og:description" content="页是MySQL管理存储空间的基本单位，一个页的大小一般是16KB。页类型为B-tree Node的页存放的即是表中行的实际数据了。在本文中将从底层详细的介绍InnoDB存储引擎中页的结构。
 在看本文前，建议先看一下 innodb记录存储结构">
@@ -110,7 +110,7 @@
 <meta property="og:image" content="http://yoursite.com/upload/page_slot3.png">
 <meta property="og:image" content="http://yoursite.com/upload/page_slot4.png">
 <meta property="og:image" content="http://yoursite.com/upload/page_linked_list.png">
-<meta property="og:updated_time" content="2018-07-24T16:55:22.854Z">
+<meta property="og:updated_time" content="2018-07-26T17:04:27.549Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="InnoDB数据页结构">
 <meta name="twitter:description" content="页是MySQL管理存储空间的基本单位，一个页的大小一般是16KB。页类型为B-tree Node的页存放的即是表中行的实际数据了。在本文中将从底层详细的介绍InnoDB存储引擎中页的结构。
@@ -143,7 +143,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/07/14/InnoDB数据页结构/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/07/11/InnoDB数据页结构/"/>
 
 
 
@@ -278,7 +278,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/14/InnoDB数据页结构/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/11/InnoDB数据页结构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -314,8 +314,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-14T15:25:00+08:00">
-                2018-07-14
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-11T15:25:00+08:00">
+                2018-07-11
               </time>
             
 
@@ -373,7 +373,7 @@
 
       
         <p>页是MySQL管理存储空间的基本单位，一个页的大小一般是16KB。页类型为B-tree Node的页存放的即是表中行的实际数据了。在本文中将从底层详细的介绍InnoDB存储引擎中页的结构。</p>
-<p>在看本文前，建议先看一下 <a href="/2018/07/11/innodb记录存储结构/" title="innodb记录存储结构">innodb记录存储结构</a> </p>
+<p>在看本文前，建议先看一下 <a href="/2018/07/10/innodb记录存储结构/" title="innodb记录存储结构">innodb记录存储结构</a> </p>
 <a id="more"></a>
 <h1 id="数据页简介"><a href="#数据页简介" class="headerlink" title="数据页简介"></a>数据页简介</h1><p>页的本质就是一块16KB大小的存储空间，InnoDB为了不同的目的而把页分为不同的类型，其中用于存放记录的页也称为数据页，我们先看看这个用于存放记录的页长什么样。数据页代表的这块16KB大小的存储空间可以被划分为多个部分，不同部分有不同的功能，各个部分如图所示：</p>
 <p><img src="/upload/page_content.png" alt="avatar"></p>
@@ -714,7 +714,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/07/11/innodb记录存储结构/" rel="next" title="innodb记录存储结构">
+              <a href="/2018/07/10/innodb记录存储结构/" rel="next" title="innodb记录存储结构">
                 <i class="fa fa-chevron-left"></i> innodb记录存储结构
               </a>
             
@@ -724,8 +724,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/07/15/MySQL索引的使用/" rel="prev" title="MySQL索引的使用">
-                MySQL索引的使用 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/07/14/MySQL索引/" rel="prev" title="MySQL索引">
+                MySQL索引 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
