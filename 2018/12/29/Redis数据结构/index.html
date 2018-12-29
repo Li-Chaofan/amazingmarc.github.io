@@ -87,19 +87,16 @@
 
 
 
-<meta name="description" content="锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。
-如果在查询中使用了辅助索引，并且要设置的索引记录的">
+<meta name="description" content="概述相比于memcache 作为缓存服务，redis 提供了更为丰富的数据结构：String， List，Set，SortedSet，Hash等。对于这五种数据结构，可以结合Java中的对应的类来进行理解，其中String数据结构对应Object类 （任意对象都会序列化成string来存储），List数据结构对应java.util.List接口的实现类java.util.LinkedList，Se">
 <meta property="og:type" content="article">
-<meta property="og:title" content="InnoDB不同语句的加锁行为">
-<meta property="og:url" content="http://yoursite.com/2018/07/26/InnoDB不同语句的加锁行为/index.html">
+<meta property="og:title" content="Redis数据结构介绍">
+<meta property="og:url" content="http://yoursite.com/2018/12/29/Redis数据结构/index.html">
 <meta property="og:site_name" content="李超凡的读书笔记">
-<meta property="og:description" content="锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。
-如果在查询中使用了辅助索引，并且要设置的索引记录的">
-<meta property="og:updated_time" content="2018-07-26T01:21:47.337Z">
+<meta property="og:description" content="概述相比于memcache 作为缓存服务，redis 提供了更为丰富的数据结构：String， List，Set，SortedSet，Hash等。对于这五种数据结构，可以结合Java中的对应的类来进行理解，其中String数据结构对应Object类 （任意对象都会序列化成string来存储），List数据结构对应java.util.List接口的实现类java.util.LinkedList，Se">
+<meta property="og:updated_time" content="2018-12-29T07:28:56.508Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="InnoDB不同语句的加锁行为">
-<meta name="twitter:description" content="锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。
-如果在查询中使用了辅助索引，并且要设置的索引记录的">
+<meta name="twitter:title" content="Redis数据结构介绍">
+<meta name="twitter:description" content="概述相比于memcache 作为缓存服务，redis 提供了更为丰富的数据结构：String， List，Set，SortedSet，Hash等。对于这五种数据结构，可以结合Java中的对应的类来进行理解，其中String数据结构对应Object类 （任意对象都会序列化成string来存储），List数据结构对应java.util.List接口的实现类java.util.LinkedList，Se">
 
 
 
@@ -127,13 +124,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/07/26/InnoDB不同语句的加锁行为/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/12/29/Redis数据结构/"/>
 
 
 
 
 
-  <title> InnoDB不同语句的加锁行为 | 李超凡的读书笔记 </title>
+  <title> Redis数据结构介绍 | 李超凡的读书笔记 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -262,7 +259,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/26/InnoDB不同语句的加锁行为/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/29/Redis数据结构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -283,7 +280,7 @@
             
             
               
-                InnoDB不同语句的加锁行为
+                Redis数据结构介绍
               
             
           </h1>
@@ -298,8 +295,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-26T08:06:00+08:00">
-                2018-07-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-29T15:25:00+08:00">
+                2018-12-29
               </time>
             
 
@@ -321,8 +318,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
-                    <span itemprop="name">InnoDB</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -356,26 +353,32 @@
       
 
       
-        <p>锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。</p>
-<p>如果在查询中使用了辅助索引，并且要设置的索引记录的锁是X Lock，InnoDB还会检索相应的聚簇索引记录并对它们加锁。</p>
-<p>如果你的查询语句没有适合的索引，MySQL必须扫描整个表来处理语句，表的每一行都会被锁定（但注意这不是表锁），这反过来会阻止其他事务对表的所有插入。 创建好的索引非常重要，这样您的查询就不会扫描很不必要地行。</p>
-<p>本文我们介绍不同的SQL语句的加锁情况：<br><a id="more"></a></p>
-<p><strong>SELECT … FROM</strong> 是一致性非锁定读，也就是读的数据快照，因此不需要加锁。但是在事务隔离级别为SERIALIZABLE的时候还是要加锁的，在事务隔离级别为SERIALIZABLE的情况下，会对索引记录加next-key locks 不过当使用唯一索引查询有唯一属性的列的时候next-key locks会降级为record lock.</p>
-<p><strong>SELECT … FOR UPDATE or SELECT … LOCK IN SHARE MODE</strong> 会对扫描的索引记录加锁，并且一般情况下，对于不满足查询条件的记录（WHERE 语句中的条件）会立即释放锁。然而在某些情况下，并不会立即释放不满足条件的行记录的锁。比如在UNION中，在MySQL评判是否满足WHERE条件之前会把所有扫描的记录会插入到一个临时表中，这样，只有在查询结束的时候才能释放锁（满足条件或者不满足条件的的行记录对应的锁）。而不是在扫描的过程中就释放不满足条件的记录锁。</p>
-<p>总之，向UNION这种情况，是等所有表的相关数据都拿到之后才能判断是否满足最终WHERE条件，所以在获取每个表中的记录时无法判断该语句是否最终满足条件，因此是会一直锁定的。</p>
-<p><strong>SELECT … LOCK IN SHARE MODE </strong> 会在查询的索引记录上加 shared next-key locks。同样，对于使用唯一索引查询具有唯一属性的查询会降级为record lock.</p>
-<p><strong>SELECT … FOR UPDATE</strong> 会在查询的索引记录上加 exclusive next-key locks。同样，对于使用唯一索引查询具有唯一属性的查询会降级为record lock.<br>注意：SELECT … FOR UPDATE因为加的是X Lock 所以会阻塞其他事务对于相应记录（以及间隙）的更新或者删除操作，以及 SELECT … LOCK IN SHARE MODE 模式的读操作。而一致性非锁定读不会受记录上任何锁的影响</p>
-<p><strong>UPDATE … WHERE … </strong> 会在查询的索引记录上加 exclusive next-key locks。同样，对于使用唯一索引查询具有唯一属性的查询会降级为record lock.<br>当UPDATE修改聚簇索引记录时，将对受影响的辅助索引记录采用隐式锁定。 在插入新的辅助索引记录之前执行duplicate check时, 以及插入新的辅助索引记录时, 更新操作还会对受影响的辅助索引记录加上S Lock。</p>
-<p><strong>DELETE FROM … WHERE …</strong> 会在查询的索引记录上加 exclusive next-key locks。同样，对于使用唯一索引查询具有唯一属性的查询会降级为record lock.</p>
-<p><strong>INSERT </strong> INSERT在插入的行上设置独占锁。此锁是索引记录锁，而不是next-key locks（即没有间隙锁），并且不会阻止其他事务在插入行之之前的间隙进行插入。</p>
-<p>在插入行之前，会设置一种称为插入意向间隙锁insert intention gap lock（间隙锁的一种）。在insert intention gap lock时，加如果插入到相同索引间隙中的多个事务不插入间隙内的相同位置，则不需要等待彼此（但每个事务都会加上 insert intention gap lock）。假设存在值为4和7的索引记录。尝试插入值5和6的两个事务在获取插入行上的独占锁之前使用insert intention gap lock锁定4和7之间的间隙，但因为插入的行是不冲突的，所以不会相互阻塞。</p>
-<p>如果插入过程中发生duplicate-key error，则会对该索引记录上加S Lock。如果有多个事务尝试插入同一行，并且另一个事务已经具有了X Lock，则使用共享锁可能导致死锁。关于这种死锁情况 我在 <a href="/2018/07/25/重现Insert死锁问题/" title="重现Insert死锁问题">重现Insert死锁问题</a> 这篇文章中详细做了说明。</p>
-<p><strong>INSERT … ON DUPLICATE KEY UPDATE</strong> 与淡出的INSERT语句不同的是，当发生duplicate-key error时，会对相应的索引记录加上X Lock,而不是 S Lock。对重复的主键值采用独占索引记录锁定（X Record Lock）。 对于重复的唯一键值，会采用 X next-keylock锁定。</p>
-<p><strong>REPLACE</strong> 如果唯一键上没有冲突，REPLACE就像INSERT一样完成。 否则，在要替换的行上设置 X next-key lock。</p>
-<p><strong>INSERT INTO T SELECT … FROM S WHERE … </strong> 在插入T的每一行上设置一个X Record Lock（without a gap lock）。如果事务隔离级别是READ COMMITTED，或者启用innodb_locks_unsafe_for_binlog并且事务隔离级别 不是SERIALIZABLE，InnoDB将S上的查询作为一致性非锁定读取（无锁）。 否则，InnoDB在查询的S的行上加S next-key locks。</p>
-<p><strong>CREATE TABLE … SELECT …</strong> 与INSERT … SELECT差不多都会对SELECT 操作加S next-key locks或者采取一致性非锁定读。</p>
-<p>对于AUTO_INCREMENT的锁定，<a href="/2018/07/25/InnoDB中的锁/" title="InnoDB中的锁">InnoDB中的锁</a> 里面已经做过介绍，就不再赘述。</p>
-<p>如果在表上定义了FOREIGN KEY约束，则需要检查约束条件的任何插入，更新或删除都会在其查看的记录上设置共享记录级锁定以检查约束。 InnoDB还会在约束失败的情况下设置这些锁。</p>
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>相比于memcache 作为缓存服务，redis 提供了更为丰富的数据结构：String， List，Set，SortedSet，Hash等。对于这五种数据结构，可以结合Java中的对应的类来进行理解，其中String数据结构对应Object类 （任意对象都会序列化成string来存储），List数据结构对应java.util.List接口的实现类java.util.LinkedList，Set数据结构对应java.util.Set接口，SortedSet数据结构对应java.util.SortedSet接口，Hash数据结构对应java.util.HashMap类。下面简单介绍下几种数据结构以及使用场景。</p>
+<a id="more"></a>
+<h1 id="String"><a href="#String" class="headerlink" title="String"></a>String</h1><p>String类型是Redis中最为基础的数据存储类型，是二进制安全的字符串，该类型可以接受任何格式的数据，如JPEG图像数据或Json对象描述信息等。在Redis中String类型的Value最多可以容纳的数据长度是512M。相对于其他的几种数据结构，只有String类型的命令在写入key的时候可以带有默认的过期时间，对于其他的数据结构，key默认是不过期的，如果需要设置过期时间，必须显示调用expire函数设置过期时间。<br>使用场景：value较小、模型简单的 value可以使用String类型存储，对于一些特殊的数据结构，比如List、Set等，建议采用相应的下面介绍的List和Set数据结构进行存储，这样不仅可以节省存储空间还可以提高操作效率。</p>
+<h1 id="List"><a href="#List" class="headerlink" title="List"></a>List</h1><p>List类型是按照插入顺序排序的字符串链表。和数据结构中的普通链表一样，可以在其头部(left)和尾部(right)添加新的元素。在插入时，如果该键并不存在，Redis将为该键创建一个新的链表。与此相反，如果链表中所有的元素均被移除，那么该键也将会被从数据库中删除。</p>
+<p>从元素插入和删除的效率视角来看，如果是在链表的两头插入或删除元素，这将会是非常高效的操作，即使链表中已经存储了百万条记录，该操作也可以在常量时间内完成。然而需要说明的是，如果元素插入或删除操作是作用于链表中间，那将会是非常低效的。</p>
+<p>使用场景：在评级系统中，比如社会化新闻网站，你可以把每个新提交的链接添加到一个list，用LRANGE可简单的对结果分页；在博客引擎实现中，你可为每篇日志设置一个list，在该list中推入进博客评论等等。</p>
+<h1 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h1><p>Set类型是没有排序的字符串集合，和List类型一样，也可以在该类型的数据值上执行添加、删除或判断某一元素是否存在等操作。和List类型不同的是，Set集合中不允许出现重复的元素，如果多次添加相同元素，Set中将仅保留该元素的一份拷贝。</p>
+<p>使用场景：可以使用Redis的Set数据类型跟踪一些唯一性数据，比如访问某一博客的唯一IP地址信息。对于此场景，仅需在每次访问该博客时将访问者的IP存入Redis中，Set数据类型会自动保证IP地址的唯一性。</p>
+<h1 id="SortedSet"><a href="#SortedSet" class="headerlink" title="SortedSet"></a>SortedSet</h1><p>SortedSet和Set类型极为相似，它们都是字符串的集合，都不允许重复的成员出现在一个Set中。它们之间的主要差别是SortedSet中的每一个成员都会有一个分数(score)与之关联，Redis正是通过分数来为集合中的成员进行从小到大的排序。需要额外指出的是，尽管SortedSet中的成员必须是唯一的，但是分数(score)却是可以重复的。在SortedSet中添加、删除或更新一个成员都是非常快速的操作，其时间复杂度为O(logn)。由于SortedSet中的成员在集合中的位置是有序的，因此，即便是访问位于集合中部的成员也仍然是非常高效的。</p>
+<p>使用场景：</p>
+<ul>
+<li><p>可以用于一个大型在线游戏的积分排行榜。每当玩家的分数发生变化时，可以执行ZADD命令更新玩家的分数，此后再通过ZRANGE命令获取积分TOP TEN的用户信息。当然也可以利用ZRANK命令通过username来获取玩家的排行信息。最后将组合使用ZRANGE和ZRANK命令快速的获取和某个玩家积分相近的其他用户的信息。</p>
+</li>
+<li><p>SortedSet类型还可用于构建索引数据。</p>
+</li>
+<li><p>建立一个SortedSet中元素个数不要超过 1 W。</p>
+</li>
+</ul>
+<h1 id="Hash"><a href="#Hash" class="headerlink" title="Hash"></a>Hash</h1><p>Hash类型相当于Java中的HashMap。所以该类型非常适合于存储值对象的信息，比如User对象含有Username、Password和Age等属性，可以使用hash来存储User，每个field对应一个属性，好处是可以做到部分更新、获取。如果Hash中包含很少的字段，那么该类型的数据也将仅占用很少的磁盘空间。</p>
+<p>使用场景：</p>
+<ul>
+<li><p>对于海量数据的情况，可以自己对数据进行分桶，然后使用Hash结构来存储。对于很多value为简单的字符串，做过测试，采用hash存储更节省空间。</p>
+</li>
+<li><p>将对象存储为Hash结构而不是String，可以每次只更新、获取Hash中的一个field，这样可以提高效率。</p>
+</li>
+</ul>
 
       
     </div>
@@ -412,8 +415,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/07/25/InnoDB中的锁/" rel="next" title="InnoDB中的锁">
-                <i class="fa fa-chevron-left"></i> InnoDB中的锁
+              <a href="/2018/09/27/Java泛型/" rel="next" title="JAVA泛型">
+                <i class="fa fa-chevron-left"></i> JAVA泛型
               </a>
             
           </div>
@@ -421,10 +424,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/07/27/InnoDB加锁处理分析/" rel="prev" title="InnoDB加锁处理分析">
-                InnoDB加锁处理分析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -471,8 +470,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/lufei.jpg"
@@ -554,6 +562,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#String"><span class="nav-number">2.</span> <span class="nav-text">String</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#List"><span class="nav-number">3.</span> <span class="nav-text">List</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Set"><span class="nav-number">4.</span> <span class="nav-text">Set</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SortedSet"><span class="nav-number">5.</span> <span class="nav-text">SortedSet</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hash"><span class="nav-number">6.</span> <span class="nav-text">Hash</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
