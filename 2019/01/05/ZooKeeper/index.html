@@ -87,14 +87,10 @@
 
 
 
-<meta name="description" content="前言相信大家对 ZooKeeper 应该不算陌生。但是你真的了解 ZooKeeper 是个什么东西吗？如果别人/面试官让你给他讲讲  ZooKeeper 是个什么东西，你能回答到什么地步呢？
-我本人曾经使用过 ZooKeeper 作为 Dubbo 的注册中心，另外在搭建 solr 集群的时候，我使用到了  ZooKeeper 作为 solr 集群的管理工具。前几天，总结项目经验的时候，我突然问自">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Zookeeper">
 <meta property="og:url" content="http://yoursite.com/2019/01/05/ZooKeeper/index.html">
 <meta property="og:site_name" content="李超凡的读书笔记">
-<meta property="og:description" content="前言相信大家对 ZooKeeper 应该不算陌生。但是你真的了解 ZooKeeper 是个什么东西吗？如果别人/面试官让你给他讲讲  ZooKeeper 是个什么东西，你能回答到什么地步呢？
-我本人曾经使用过 ZooKeeper 作为 Dubbo 的注册中心，另外在搭建 solr 集群的时候，我使用到了  ZooKeeper 作为 solr 集群的管理工具。前几天，总结项目经验的时候，我突然问自">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-10/56385654.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-10/35571782.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-10/27473480.jpg">
@@ -102,11 +98,9 @@
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-10/68900686.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-10/89602762.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-13/91622395.jpg">
-<meta property="og:updated_time" content="2019-01-07T13:16:30.076Z">
+<meta property="og:updated_time" content="2019-01-08T02:30:54.058Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Zookeeper">
-<meta name="twitter:description" content="前言相信大家对 ZooKeeper 应该不算陌生。但是你真的了解 ZooKeeper 是个什么东西吗？如果别人/面试官让你给他讲讲  ZooKeeper 是个什么东西，你能回答到什么地步呢？
-我本人曾经使用过 ZooKeeper 作为 Dubbo 的注册中心，另外在搭建 solr 集群的时候，我使用到了  ZooKeeper 作为 solr 集群的管理工具。前几天，总结项目经验的时候，我突然问自">
 <meta name="twitter:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-10/56385654.jpg">
 
 
@@ -364,7 +358,7 @@
       
 
       
-        <p><img src="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-10/56385654.jpg" alt=""></p>
+        <p><img src="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-10/56385654.jpg" alt=""><br><a id="more"></a></p>
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>相信大家对 ZooKeeper 应该不算陌生。但是你真的了解 ZooKeeper 是个什么东西吗？如果别人/面试官让你给他讲讲  ZooKeeper 是个什么东西，你能回答到什么地步呢？</p>
 <p>我本人曾经使用过 ZooKeeper 作为 Dubbo 的注册中心，另外在搭建 solr 集群的时候，我使用到了  ZooKeeper 作为 solr 集群的管理工具。前几天，总结项目经验的时候，我突然问自己 ZooKeeper 到底是个什么东西？想了半天，脑海中只是简单的能浮现出几句话：“①Zookeeper 可以被用作注册中心。 ②Zookeeper 是 Hadoop 生态系统的一员；③构建 Zookeeper 集群的时候，使用的服务器最好是奇数台。” 可见，我对于 Zookeeper 的理解仅仅是停留在了表面。</p>
 <p>所以，<strong>通过本文，希望带大家稍微详细的了解一下 ZooKeeper 。如果没有学过 ZooKeeper ，那么本文将会是你进入 ZooKeeper 大门的垫脚砖。如果你已经接触过 ZooKeeper ，那么本文将带你回顾一下 ZooKeeper 的一些基础概念。</strong></p>
