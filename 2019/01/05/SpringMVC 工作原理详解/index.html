@@ -1,0 +1,788 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java, Meituan" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="SpringMVC 简单介绍SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给控制器，然后通过模型对象，分派器来展示请求结果视图。其中核心类是 DispatcherServlet，它是一个 Servlet，顶层是实现的Servlet接口。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringMVC">
+<meta property="og:url" content="http://yoursite.com/2019/01/05/SpringMVC 工作原理详解/index.html">
+<meta property="og:site_name" content="李超凡的读书笔记">
+<meta property="og:description" content="SpringMVC 简单介绍SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给控制器，然后通过模型对象，分派器来展示请求结果视图。其中核心类是 DispatcherServlet，它是一个 Servlet，顶层是实现的Servlet接口。">
+<meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/60679444.jpg">
+<meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/49790288.jpg">
+<meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/96666164.jpg">
+<meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/91433100.jpg">
+<meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/50343885.jpg">
+<meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/49497279.jpg">
+<meta property="og:updated_time" content="2019-01-07T13:14:54.725Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringMVC">
+<meta name="twitter:description" content="SpringMVC 简单介绍SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给控制器，然后通过模型对象，分派器来展示请求结果视图。其中核心类是 DispatcherServlet，它是一个 Servlet，顶层是实现的Servlet接口。">
+<meta name="twitter:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/60679444.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/05/SpringMVC 工作原理详解/"/>
+
+
+
+
+
+  <title> SpringMVC | 李超凡的读书笔记 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">李超凡的读书笔记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/05/SpringMVC 工作原理详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李超凡的读书笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                SpringMVC
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-05T15:25:00+08:00">
+                2019-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="SpringMVC-简单介绍"><a href="#SpringMVC-简单介绍" class="headerlink" title="SpringMVC 简单介绍"></a>SpringMVC 简单介绍</h3><p>SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给控制器，然后通过模型对象，分派器来展示请求结果视图。其中核心类是 DispatcherServlet，它是一个 Servlet，顶层是实现的Servlet接口。<br><a id="more"></a></p>
+<h3 id="先来看一下什么是-MVC-模式"><a href="#先来看一下什么是-MVC-模式" class="headerlink" title="先来看一下什么是 MVC 模式"></a>先来看一下什么是 MVC 模式</h3><p>MVC 是一种设计模式.</p>
+<p><strong>MVC 的原理图如下：</strong></p>
+<p><img src="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/60679444.jpg" alt=""></p>
+<h3 id="SpringMVC-使用"><a href="#SpringMVC-使用" class="headerlink" title="SpringMVC 使用"></a>SpringMVC 使用</h3><p>需要在 web.xml 中配置 DispatcherServlet 。并且需要配置 Spring 监听器ContextLoaderListener</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">listener</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>org.springframework.web.context.ContextLoaderListener</div><div class="line">	<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">listener</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>springmvc<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet</div><div class="line">	<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></div><div class="line">	<span class="comment">&lt;!-- 如果不设置init-param标签，则必须在/WEB-INF/下创建xxx-servlet.xml文件，其中xxx是servlet-name中配置的名称。 --&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">init-param</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:spring/springmvc-servlet.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>springmvc<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="SpringMVC-工作原理（重要）"><a href="#SpringMVC-工作原理（重要）" class="headerlink" title="SpringMVC 工作原理（重要）"></a>SpringMVC 工作原理（重要）</h3><p><strong>简单来说：</strong></p>
+<p>客户端发送请求-&gt; 前端控制器 DispatcherServlet 接受客户端请求 -&gt; 找到处理器映射 HandlerMapping 解析请求对应的 Handler-&gt; HandlerAdapter 会根据 Handler 来调用真正的处理器开处理请求，并处理相应的业务逻辑 -&gt; 处理器返回一个模型视图 ModelAndView -&gt; 视图解析器进行解析 -&gt; 返回一个视图对象-&gt;前端控制器 DispatcherServlet 渲染数据（Moder）-&gt;将得到视图对象返回给用户</p>
+<p><strong>如下图所示：</strong><br><img src="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/49790288.jpg" alt="SpringMVC运行原理"></p>
+<p>上图的一个笔误的小问题：Spring MVC 的入口函数也就是前端控制器 DispatcherServlet 的作用是接收请求，响应结果。</p>
+<p><strong>流程说明（重要）：</strong></p>
+<p>（1）客户端（浏览器）发送请求，直接请求到 DispatcherServlet。</p>
+<p>（2）DispatcherServlet 根据请求信息调用 HandlerMapping，解析请求对应的 Handler。</p>
+<p>（3）解析到对应的 Handler（也就是我们平常说的 Controller 控制器）后，开始由 HandlerAdapter 适配器处理。</p>
+<p>（4）HandlerAdapter 会根据 Handler 来调用真正的处理器开处理请求，并处理相应的业务逻辑。</p>
+<p>（5）处理器处理完业务后，会返回一个 ModelAndView 对象，Model 是返回的数据对象，View 是个逻辑上的 View。</p>
+<p>（6）ViewResolver 会根据逻辑 View 查找实际的 View。</p>
+<p>（7）DispaterServlet 把返回的 Model 传给 View（视图渲染）。</p>
+<p>（8）把 View 返回给请求者（浏览器）</p>
+<h3 id="SpringMVC-重要组件说明"><a href="#SpringMVC-重要组件说明" class="headerlink" title="SpringMVC 重要组件说明"></a>SpringMVC 重要组件说明</h3><p><strong>1、前端控制器DispatcherServlet（不需要工程师开发）,由框架提供（重要）</strong></p>
+<p>作用：<strong>Spring MVC 的入口函数。接收请求，响应结果，相当于转发器，中央处理器。有了 DispatcherServlet 减少了其它组件之间的耦合度。用户请求到达前端控制器，它就相当于mvc模式中的c，DispatcherServlet是整个流程控制的中心，由它调用其它组件处理用户的请求，DispatcherServlet的存在降低了组件之间的耦合性。</strong></p>
+<p><strong>2、处理器映射器HandlerMapping(不需要工程师开发),由框架提供</strong></p>
+<p>作用：根据请求的url查找Handler。HandlerMapping负责根据用户请求找到Handler即处理器（Controller），SpringMVC提供了不同的映射器实现不同的映射方式，例如：配置文件方式，实现接口方式，注解方式等。</p>
+<p><strong>3、处理器适配器HandlerAdapter</strong></p>
+<p>作用：按照特定规则（HandlerAdapter要求的规则）去执行Handler<br>通过HandlerAdapter对处理器进行执行，这是适配器模式的应用，通过扩展适配器可以对更多类型的处理器进行执行。</p>
+<p><strong>4、处理器Handler(需要工程师开发)</strong></p>
+<p>注意：编写Handler时按照HandlerAdapter的要求去做，这样适配器才可以去正确执行Handler<br>Handler 是继DispatcherServlet前端控制器的后端控制器，在DispatcherServlet的控制下Handler对具体的用户请求进行处理。<br>由于Handler涉及到具体的用户业务请求，所以一般情况需要工程师根据业务需求开发Handler。</p>
+<p><strong>5、视图解析器View resolver(不需要工程师开发),由框架提供</strong></p>
+<p>作用：进行视图解析，根据逻辑视图名解析成真正的视图（view）<br>View Resolver负责将处理结果生成View视图，View Resolver首先根据逻辑视图名解析成物理视图名即具体的页面地址，再生成View视图对象，最后对View进行渲染将处理结果通过页面展示给用户。 springmvc框架提供了很多的View视图类型，包括：jstlView、freemarkerView、pdfView等。<br>一般情况下需要通过页面标签或页面模版技术将模型数据通过页面展示给用户，需要由工程师根据业务需求开发具体的页面。</p>
+<p><strong>6、视图View(需要工程师开发)</strong></p>
+<p>View是一个接口，实现类支持不同的View类型（jsp、freemarker、pdf…）</p>
+<p><strong>注意：处理器Handler（也就是我们平常说的Controller控制器）以及视图层view都是需要我们自己手动开发的。其他的一些组件比如：前端控制器DispatcherServlet、处理器映射器HandlerMapping、处理器适配器HandlerAdapter等等都是框架提供给我们的，不需要自己手动开发。</strong></p>
+<h3 id="DispatcherServlet详细解析"><a href="#DispatcherServlet详细解析" class="headerlink" title="DispatcherServlet详细解析"></a>DispatcherServlet详细解析</h3><p>首先看下源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> org.springframework.web.servlet;</div><div class="line"> </div><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"serial"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DispatcherServlet</span> <span class="keyword">extends</span> <span class="title">FrameworkServlet</span> </span>&#123;</div><div class="line"> </div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String MULTIPART_RESOLVER_BEAN_NAME = <span class="string">"multipartResolver"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String LOCALE_RESOLVER_BEAN_NAME = <span class="string">"localeResolver"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String THEME_RESOLVER_BEAN_NAME = <span class="string">"themeResolver"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HANDLER_MAPPING_BEAN_NAME = <span class="string">"handlerMapping"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HANDLER_ADAPTER_BEAN_NAME = <span class="string">"handlerAdapter"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HANDLER_EXCEPTION_RESOLVER_BEAN_NAME = <span class="string">"handlerExceptionResolver"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String REQUEST_TO_VIEW_NAME_TRANSLATOR_BEAN_NAME = <span class="string">"viewNameTranslator"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String VIEW_RESOLVER_BEAN_NAME = <span class="string">"viewResolver"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String FLASH_MAP_MANAGER_BEAN_NAME = <span class="string">"flashMapManager"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String WEB_APPLICATION_CONTEXT_ATTRIBUTE = DispatcherServlet.class.getName() + <span class="string">".CONTEXT"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String LOCALE_RESOLVER_ATTRIBUTE = DispatcherServlet.class.getName() + <span class="string">".LOCALE_RESOLVER"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String THEME_RESOLVER_ATTRIBUTE = DispatcherServlet.class.getName() + <span class="string">".THEME_RESOLVER"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String THEME_SOURCE_ATTRIBUTE = DispatcherServlet.class.getName() + <span class="string">".THEME_SOURCE"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String INPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + <span class="string">".INPUT_FLASH_MAP"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String OUTPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + <span class="string">".OUTPUT_FLASH_MAP"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String FLASH_MAP_MANAGER_ATTRIBUTE = DispatcherServlet.class.getName() + <span class="string">".FLASH_MAP_MANAGER"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String EXCEPTION_ATTRIBUTE = DispatcherServlet.class.getName() + <span class="string">".EXCEPTION"</span>;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String PAGE_NOT_FOUND_LOG_CATEGORY = <span class="string">"org.springframework.web.servlet.PageNotFound"</span>;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String DEFAULT_STRATEGIES_PATH = <span class="string">"DispatcherServlet.properties"</span>;</div><div class="line">	<span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> Log pageNotFoundLogger = LogFactory.getLog(PAGE_NOT_FOUND_LOG_CATEGORY);</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Properties defaultStrategies;</div><div class="line">	<span class="keyword">static</span> &#123;</div><div class="line">		<span class="keyword">try</span> &#123;</div><div class="line">			ClassPathResource resource = <span class="keyword">new</span> ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);</div><div class="line">			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">catch</span> (IOException ex) &#123;</div><div class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Could not load 'DispatcherServlet.properties': "</span> + ex.getMessage());</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"> </div><div class="line">	<span class="comment">/** Detect all HandlerMappings or just expect "handlerMapping" bean? */</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> detectAllHandlerMappings = <span class="keyword">true</span>;</div><div class="line"> </div><div class="line">	<span class="comment">/** Detect all HandlerAdapters or just expect "handlerAdapter" bean? */</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> detectAllHandlerAdapters = <span class="keyword">true</span>;</div><div class="line"> </div><div class="line">	<span class="comment">/** Detect all HandlerExceptionResolvers or just expect "handlerExceptionResolver" bean? */</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> detectAllHandlerExceptionResolvers = <span class="keyword">true</span>;</div><div class="line"> </div><div class="line">	<span class="comment">/** Detect all ViewResolvers or just expect "viewResolver" bean? */</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> detectAllViewResolvers = <span class="keyword">true</span>;</div><div class="line"> </div><div class="line">	<span class="comment">/** Throw a NoHandlerFoundException if no Handler was found to process this request? **/</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> throwExceptionIfNoHandlerFound = <span class="keyword">false</span>;</div><div class="line"> </div><div class="line">	<span class="comment">/** Perform cleanup of request attributes after include request? */</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> cleanupAfterInclude = <span class="keyword">true</span>;</div><div class="line"> </div><div class="line">	<span class="comment">/** MultipartResolver used by this servlet */</span></div><div class="line">	<span class="keyword">private</span> MultipartResolver multipartResolver;</div><div class="line"> </div><div class="line">	<span class="comment">/** LocaleResolver used by this servlet */</span></div><div class="line">	<span class="keyword">private</span> LocaleResolver localeResolver;</div><div class="line"> </div><div class="line">	<span class="comment">/** ThemeResolver used by this servlet */</span></div><div class="line">	<span class="keyword">private</span> ThemeResolver themeResolver;</div><div class="line"> </div><div class="line">	<span class="comment">/** List of HandlerMappings used by this servlet */</span></div><div class="line">	<span class="keyword">private</span> List&lt;HandlerMapping&gt; handlerMappings;</div><div class="line"> </div><div class="line">	<span class="comment">/** List of HandlerAdapters used by this servlet */</span></div><div class="line">	<span class="keyword">private</span> List&lt;HandlerAdapter&gt; handlerAdapters;</div><div class="line"> </div><div class="line">	<span class="comment">/** List of HandlerExceptionResolvers used by this servlet */</span></div><div class="line">	<span class="keyword">private</span> List&lt;HandlerExceptionResolver&gt; handlerExceptionResolvers;</div><div class="line"> </div><div class="line">	<span class="comment">/** RequestToViewNameTranslator used by this servlet */</span></div><div class="line">	<span class="keyword">private</span> RequestToViewNameTranslator viewNameTranslator;</div><div class="line"> </div><div class="line">	<span class="keyword">private</span> FlashMapManager flashMapManager;</div><div class="line"> </div><div class="line">	<span class="comment">/** List of ViewResolvers used by this servlet */</span></div><div class="line">	<span class="keyword">private</span> List&lt;ViewResolver&gt; viewResolvers;</div><div class="line"> </div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">DispatcherServlet</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">super</span>();</div><div class="line">	&#125;</div><div class="line"> </div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">DispatcherServlet</span><span class="params">(WebApplicationContext webApplicationContext)</span> </span>&#123;</div><div class="line">		<span class="keyword">super</span>(webApplicationContext);</div><div class="line">	&#125;</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onRefresh</span><span class="params">(ApplicationContext context)</span> </span>&#123;</div><div class="line">		initStrategies(context);</div><div class="line">	&#125;</div><div class="line"> </div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initStrategies</span><span class="params">(ApplicationContext context)</span> </span>&#123;</div><div class="line">		initMultipartResolver(context);</div><div class="line">		initLocaleResolver(context);</div><div class="line">		initThemeResolver(context);</div><div class="line">		initHandlerMappings(context);</div><div class="line">		initHandlerAdapters(context);</div><div class="line">		initHandlerExceptionResolvers(context);</div><div class="line">		initRequestToViewNameTranslator(context);</div><div class="line">		initViewResolvers(context);</div><div class="line">		initFlashMapManager(context);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>DispatcherServlet类中的属性beans：</p>
+<ul>
+<li>HandlerMapping：用于handlers映射请求和一系列的对于拦截器的前处理和后处理，大部分用@Controller注解。</li>
+<li>HandlerAdapter：帮助DispatcherServlet处理映射请求处理程序的适配器，而不用考虑实际调用的是 哪个处理程序。- - - </li>
+<li>ViewResolver：根据实际配置解析实际的View类型。</li>
+<li>ThemeResolver：解决Web应用程序可以使用的主题，例如提供个性化布局。</li>
+<li>MultipartResolver：解析多部分请求，以支持从HTML表单上传文件。- </li>
+<li>FlashMapManager：存储并检索可用于将一个请求属性传递到另一个请求的input和output的FlashMap，通常用于重定向。</li>
+</ul>
+<p>在Web MVC框架中，每个DispatcherServlet都拥自己的WebApplicationContext，它继承了ApplicationContext。WebApplicationContext包含了其上下文和Servlet实例之间共享的所有的基础框架beans。</p>
+<p><strong>HandlerMapping</strong></p>
+<p><img src="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/96666164.jpg" alt="HandlerMapping"></p>
+<p>HandlerMapping接口处理请求的映射HandlerMapping接口的实现类：</p>
+<ul>
+<li>SimpleUrlHandlerMapping类通过配置文件把URL映射到Controller类。</li>
+<li>DefaultAnnotationHandlerMapping类通过注解把URL映射到Controller类。</li>
+</ul>
+<p><strong>HandlerAdapter</strong></p>
+<p><img src="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/91433100.jpg" alt="HandlerAdapter"></p>
+<p>HandlerAdapter接口-处理请求映射</p>
+<p>AnnotationMethodHandlerAdapter：通过注解，把请求URL映射到Controller类的方法上。</p>
+<p><strong>HandlerExceptionResolver</strong></p>
+<p><img src="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/50343885.jpg" alt="HandlerExceptionResolver"></p>
+<p>HandlerExceptionResolver接口-异常处理接口</p>
+<ul>
+<li>SimpleMappingExceptionResolver通过配置文件进行异常处理。</li>
+<li>AnnotationMethodHandlerExceptionResolver：通过注解进行异常处理。</li>
+</ul>
+<p><strong>ViewResolver</strong></p>
+<p><img src="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-10-11/49497279.jpg" alt="ViewResolver"></p>
+<p>ViewResolver接口解析View视图。</p>
+<p>UrlBasedViewResolver类 通过配置文件，把一个视图名交给到一个View来处理。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/05/SpringBean/" rel="next" title="SpringBean">
+                <i class="fa fa-chevron-left"></i> SpringBean
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/05/synchronized/" rel="prev" title="Synchronized">
+                Synchronized <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/lufei.jpg"
+               alt="marc" />
+          <p class="site-author-name" itemprop="name">marc</p>
+           
+              <p class="site-description motion-element" itemprop="description">Keep on going</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/amazingmarc" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://tech.meituan.com/" title="美团技术博客" target="_blank">美团技术博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://blog.csdn.net/v_JULY_v" title="v_JULY_v" target="_blank">v_JULY_v</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC-简单介绍"><span class="nav-number">1.</span> <span class="nav-text">SpringMVC 简单介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#先来看一下什么是-MVC-模式"><span class="nav-number">2.</span> <span class="nav-text">先来看一下什么是 MVC 模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC-使用"><span class="nav-number">3.</span> <span class="nav-text">SpringMVC 使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC-工作原理（重要）"><span class="nav-number">4.</span> <span class="nav-text">SpringMVC 工作原理（重要）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC-重要组件说明"><span class="nav-number">5.</span> <span class="nav-text">SpringMVC 重要组件说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DispatcherServlet详细解析"><span class="nav-number">6.</span> <span class="nav-text">DispatcherServlet详细解析</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">marc</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

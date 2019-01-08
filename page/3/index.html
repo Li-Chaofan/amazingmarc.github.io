@@ -260,7 +260,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/27/java8的几个主要函数接口/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/03/搞定JVM垃圾回收就是这么简单/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -282,8 +282,8 @@
             
               
                 
-                <a class="post-title-link" href="/2018/05/27/java8的几个主要函数接口/" itemprop="url">
-                  java8的几个主要函数接口
+                <a class="post-title-link" href="/2019/01/03/搞定JVM垃圾回收就是这么简单/" itemprop="url">
+                  Jvm垃圾回收
                 </a>
               
             
@@ -299,8 +299,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-27T20:29:00+08:00">
-                2018-05-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-03T15:25:00+08:00">
+                2019-01-03
               </time>
             
 
@@ -322,8 +322,19 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -358,10 +369,22 @@
 
       
         
-          <p>java8 中在java.util.function中引入了很多函数接口，我们详对其中几个主要接口做一下说明。包括 Supplier, Consumer, Function, BinaryOperator, Predicatey以及 BiSupplier,BiConsumer,BiFunction,BiPredicate。<br>
+          <p>上文回顾：<a href="/2019/01/03/java内存区域/" title="Java内存区域">Java内存区域</a></p>
+<h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><h3 id="本节常见面试题："><a href="#本节常见面试题：" class="headerlink" title="本节常见面试题："></a>本节常见面试题：</h3><p>问题答案在文中都有提到</p>
+<ul>
+<li>如何判断对象是否死亡（两种方法）。</li>
+<li>简单的介绍一下强引用、软引用、弱引用、虚引用（虚引用与软引用和弱引用的区别、使用软引用能带来的好处）。</li>
+<li>如何判断一个常量是废弃常量</li>
+<li>如何判断一个类是无用的类</li>
+<li>垃圾收集有哪些算法，各自的特点？</li>
+<li>HotSpot为什么要分为新生代和老年代？</li>
+<li>常见的垃圾回收器有那些？</li>
+<li>介绍一下CMS,G1收集器。</li>
+<li>Minor Gc和Full GC 有什么不同呢？</li>
+</ul>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/05/27/java8的几个主要函数接口/#more" rel="contents">
+            <a class="btn" href="/2019/01/03/搞定JVM垃圾回收就是这么简单/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -407,7 +430,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/27/Collectors.toMap源码/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/02/多线程系列/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -429,8 +452,8 @@
             
               
                 
-                <a class="post-title-link" href="/2018/05/27/Collectors.toMap源码/" itemprop="url">
-                  Collectors.toMap解析
+                <a class="post-title-link" href="/2019/01/02/多线程系列/" itemprop="url">
+                  多线程系列文章
                 </a>
               
             
@@ -446,307 +469,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-27T19:19:00+08:00">
-                2018-05-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>在使用Stream时，经常会有将一个list转换为一个map的场景，这时会用到Collectors.toMap方法，这篇文章中我们详细介绍一下toMap方法以及使用该方法的几个注意点。最后我们自己实现了Collectors接口来定义了自己的toMapCollector。</p>
-<p>注意：最好先看一下<a href="/2018/05/27/Collector接口/" title="Collector接口">Collector接口</a> 这篇文章才能更好理解这篇文章。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/05/27/Collectors.toMap源码/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/27/Collector接口/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="marc">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/lufei.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李超凡的读书笔记">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2018/05/27/Collector接口/" itemprop="url">
-                  Collector接口
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-27T15:25:00+08:00">
-                2018-05-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>Java8的Stream中 我们经常会用到collect接口：</p>
-<!--�21-->
-<p>该接口会对流中的元素进行规约，比如转化成一个list,或者map等，其中参数是一个Collector接口的实现，</p>
-<p>Collector是java8中提供的一个重要接口，该接口定义了将输入元素累加到可变结果容器中，可选地在所有输入元素已被处理之后将累加结果转换为最终表示。 </p>
-<p>接下来我们对该接口进行分析：<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/05/27/Collector接口/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/24/Java并发编程：Callable、Future和FutureTask/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="marc">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/lufei.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李超凡的读书笔记">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/05/24/Java并发编程：Callable、Future和FutureTask/" itemprop="url">
-                  Callable、Future和FutureTask
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-24T10:25:00+08:00">
-                2017-05-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-02T15:25:00+08:00">
+                2019-01-02
               </time>
             
 
@@ -815,11 +539,24 @@
 
       
         
-          <p>而自从Java 1.5开始，提供了Callable和Future，通过它们可以在任务执行完毕之后得到任务执行结果。</p>
-<p>今天我们就来讨论一下Callable、Future和FutureTask三个类的使用方法。<br>
+          <blockquote>
+<h2 id="多线程系列文章"><a href="#多线程系列文章" class="headerlink" title="多线程系列文章"></a>多线程系列文章</h2><p>汇总了网上比较好的文章：<a href="https://blog.csdn.net/column/details/20860.html">Java并发编程指南</a>。</p>
+</blockquote>
+<ol>
+<li><a href="http://blog.csdn.net/qq_34337272/article/details/79640870">Java多线程学习（一）Java多线程入门</a></li>
+<li><a href="http://blog.csdn.net/qq_34337272/article/details/79655194">Java多线程学习（二）synchronized关键字（1）</a></li>
+<li><a href="http://blog.csdn.net/qq_34337272/article/details/79670775">Java多线程学习（二）synchronized关键字（2）</a></li>
+<li><a href="http://blog.csdn.net/qq_34337272/article/details/79680771">Java多线程学习（三）volatile关键字</a></li>
+<li><p><a href="http://blog.csdn.net/qq_34337272/article/details/79690279">Java多线程学习（四）等待/通知（wait/notify）机制</a></p>
+</li>
+<li><p><a href="http://blog.csdn.net/qq_34337272/article/details/79694226">Java多线程学习（五）线程间通信知识点补充</a></p>
+</li>
+<li><a href="http://blog.csdn.net/qq_34337272/article/details/79714196">Java多线程学习（六）Lock锁的使用</a></li>
+<li><a href="https://blog.csdn.net/qq_34337272/article/details/79844051">Java多线程学习（七）并发编程中一些问题</a></li>
+<li><a href="https://blog.csdn.net/qq_34337272/article/details/79959271">Java多线程学习（八）线程池与Executor 框架</a>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/24/Java并发编程：Callable、Future和FutureTask/#more" rel="contents">
+            <a class="btn" href="/2019/01/02/多线程系列/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -865,7 +602,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/23/工作中如何做好技术积累/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/29/Redis数据结构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -887,8 +624,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/23/工作中如何做好技术积累/" itemprop="url">
-                  工作中如何做好技术积累
+                <a class="post-title-link" href="/2018/12/29/Redis数据结构/" itemprop="url">
+                  Redis数据结构介绍
                 </a>
               
             
@@ -904,8 +641,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-23T20:46:25+08:00">
-                2017-05-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-29T15:25:00+08:00">
+                2018-12-29
               </time>
             
 
@@ -927,8 +664,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/胡言乱语/" itemprop="url" rel="index">
-                    <span itemprop="name">胡言乱语</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -963,19 +700,10 @@
 
       
         
-          <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>古人云：“活到老，学到老。”互联网算是最辛苦的行业之一，“加班”对工程师来说已是“家常便饭”，同时互联网技术又日新月异，很多工程师都疲于应付，叫苦不堪。以至于长期以来流传一个很广的误解：35岁是程序员工作的终点。</p>
-<p>如何在繁忙的工作中做好技术积累，构建个人核心竞争力，相信是很多工程师同行都在思考的问题。本文是我自己的一些总结，试图从三个方面来解答：</p>
-<ul>
-<li><p>第一部分阐述了一些学习的原则。任何时候，遵循一些经过检验的原则，都是影响效率的重要因素，正确的方法是成功的秘诀。</p>
-</li>
-<li><p>提升工作和学习效率的另一个重要因素是释惑和良好心态。第二部分分析了我在工作中碰到和看到的一些典型困惑。</p>
-</li>
-<li><p>成为优秀的架构师是大部分初中级工程师的阶段性目标。第三部分剖析架构师的能力模型，让大家对目标所需能力有一个比较清晰的认知。</p>
-</li>
-</ul>
+          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>相比于memcache 作为缓存服务，redis 提供了更为丰富的数据结构：String， List，Set，SortedSet，Hash等。对于这五种数据结构，可以结合Java中的对应的类来进行理解，其中String数据结构对应Object类 （任意对象都会序列化成string来存储），List数据结构对应java.util.List接口的实现类java.util.LinkedList，Set数据结构对应java.util.Set接口，SortedSet数据结构对应java.util.SortedSet接口，Hash数据结构对应java.util.HashMap类。下面简单介绍下几种数据结构以及使用场景。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/23/工作中如何做好技术积累/#more" rel="contents">
+            <a class="btn" href="/2018/12/29/Redis数据结构/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1021,7 +749,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/27/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/27/Java泛型/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -1043,8 +771,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/27/hello-world/" itemprop="url">
-                  Hello World
+                <a class="post-title-link" href="/2018/09/27/Java泛型/" itemprop="url">
+                  JAVA泛型
                 </a>
               
             
@@ -1060,8 +788,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-27T17:06:38+08:00">
-                2017-03-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-27T09:26:00+08:00">
+                2018-09-27
               </time>
             
 
@@ -1070,6 +798,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -1097,18 +847,14 @@
 
       
         
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>Madfdfddfffffffffffffffffffore info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-          
+          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在java代码开发中，泛型的使用是非常普遍的，特别是在集合中。那么，其实java中的泛型并不是真正意义上的新的类型，只是java语法中的语法糖已。便于java编译器在编译源代码的时候进行类型校验，及早发现程序错误而已，今天我们详细分析一下泛型的知识。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/27/Java泛型/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1150,7 +896,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/27/postName/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/27/InnoDB加锁处理分析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="marc">
@@ -1172,8 +918,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/27/postName/" itemprop="url">
-                  postName
+                <a class="post-title-link" href="/2018/07/27/InnoDB加锁处理分析/" itemprop="url">
+                  InnoDB加锁处理分析
                 </a>
               
             
@@ -1189,8 +935,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-27T17:02:04+08:00">
-                2017-03-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-27T01:26:00+08:00">
+                2018-07-27
               </time>
             
 
@@ -1199,6 +945,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -1226,9 +994,754 @@
 
       
         
+          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>InnoDB的加锁分析，是一个比较困难的话题，也是一个很大很大的话题，本文主要针对InnoDB加锁问题进行分析。现实情况中还有很多很多不同的场景无法一一列举分析，本文主要还是是介绍一种思路，平时对于SQL语句加锁的分析，死锁的分析可以按照这种思路来走。</p>
+<p>在看本文前，建议先看一下 <a href="/2018/07/14/MySQL索引/" title="MySQL索引">MySQL索引</a> 和 <a href="/2018/07/25/InnoDB中的锁/" title="InnoDB中的锁">InnoDB中的锁</a> </p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/27/InnoDB加锁处理分析/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/26/InnoDB不同语句的加锁行为/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李超凡的读书笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/07/26/InnoDB不同语句的加锁行为/" itemprop="url">
+                  InnoDB不同语句的加锁行为
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-26T08:06:00+08:00">
+                2018-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
           
             
           
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>锁定读取(比如SELECT …… FOR UPDATE），UPDATE或DELETE 操作通常会在处理SQL语句时给扫描到的每个索引记录加锁。 在语句中是否存在排除行某些行的WHERE条件并不重要。 InnoDB不记得确切的WHERE条件，但只知道扫描了哪些索引范围。加的锁通常Next-Key Locks，它会阻止其他事务在锁定的间隙中插入记录。</p>
+<p>如果在查询中使用了辅助索引，并且要设置的索引记录的锁是X Lock，InnoDB还会检索相应的聚簇索引记录并对它们加锁。</p>
+<p>如果你的查询语句没有适合的索引，MySQL必须扫描整个表来处理语句，表的每一行都会被锁定（但注意这不是表锁），这反过来会阻止其他事务对表的所有插入。 创建好的索引非常重要，这样您的查询就不会扫描很不必要地行。</p>
+<p>本文我们介绍不同的SQL语句的加锁情况：<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/26/InnoDB不同语句的加锁行为/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/25/InnoDB中的锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李超凡的读书笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/07/25/InnoDB中的锁/" itemprop="url">
+                  InnoDB中的锁
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-25T22:06:00+08:00">
+                2018-07-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>锁是数据库系统区别于文件系统的一个关键特性。锁机制用于管理对共享资源的并发访问。InnoDB存储引擎会在行级别上对表数据上锁。数据库系统使用锁是为了支持对共享资源进行并发访问，提供数据的完整性和一致性。有一点需要理解的是，虽然现在的数据库系统做的越来越类似，但是有多少种数据库，就有多少种锁的实现方式。<br>对于MyISAM引擎，其锁是表锁设计。并发情况下的读没有问题，但是并发插入时的性能就要差一些，若插入是在“底部”，MyISAM存储引擎还有一定的并发写入操作。InnoDB引擎锁的实现和Oracle数据库非常类似，提供一致性非锁定读、行级锁支持。行级锁没有额外的开销，并可以同时得到并发性和一致性。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/25/InnoDB中的锁/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/25/重现Insert死锁问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李超凡的读书笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/07/25/重现Insert死锁问题/" itemprop="url">
+                  重现Insert死锁问题
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-25T00:06:00+08:00">
+                2018-07-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>InnoDB 进行insert操作插入唯一索引（当然包括主键）在某种情况下会产生死锁。mysql官方文档中也对insert操作会产生死锁的情况进行了说明。<br>本文只是在官方文档的基础上重现了死锁发生的情况。建议自己看一下官方文档：<a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-locks-set.html">https://dev.mysql.com/doc/refman/5.7/en/innodb-locks-set.html</a></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/25/重现Insert死锁问题/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/23/InnoDB中的二分查找/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李超凡的读书笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/07/23/InnoDB中的二分查找/" itemprop="url">
+                  InnoDB中的二分查找
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-23T10:13:00+08:00">
+                2018-07-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>给定一个升序排列的自然数数组，数组中包含重复数字，例如：[1,2,2,3,4,4,4,5,6,7,7]。问题：给定任意自然数，对数组进行二分查找，返回数组正确的位置，给出函数实现。注：连续相同的数字，返回第一个匹配位置还是最后一个匹配位置，由函数传入参数决定。<br>本文中我们讨论这样一个“看起来简单”的二分算法需要注意的东西？</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/23/InnoDB中的二分查找/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/16/SQL中的where条件提取/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="marc">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/lufei.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李超凡的读书笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/07/16/SQL中的where条件提取/" itemprop="url">
+                  SQL中的where条件提取
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-16T15:25:00+08:00">
+                2018-07-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/InnoDB/" itemprop="url" rel="index">
+                    <span itemprop="name">InnoDB</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>一条SQL，在数据库中是如何执行的呢？相信很多人都会对这个问题比较感兴趣。当然，要完整描述一条SQL在数据库中的生命周期，这是一个非常巨大的问题，涵盖了SQL的词法解析、语法解析、权限检查、查询优化、SQL执行等一系列的步骤，简短的篇幅是绝对无能为力的。因此，本文挑选了其中的部分内容，做重点介绍：</p>
+<p>给定一条SQL，如何提取其中的where条件？where条件中的每个子条件，在SQL执行的过程中有分别起着什么样的作用？</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/16/SQL中的where条件提取/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1265,7 +1778,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1310,7 +1823,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-count">43</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1321,7 +1834,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">11</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
