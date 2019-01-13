@@ -88,15 +88,13 @@
 
 
 <meta name="description" content="一文搞懂 RabbitMQ 的重要概念以及安装一 RabbitMQ 介绍这部分参考了 《RabbitMQ实战指南》这本书的第 1 章和第 2 章。
-1.1 RabbitMQ 简介RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。
-Rab">
+1.1 RabbitMQ 简介RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="rabbitmq">
 <meta property="og:url" content="http://yoursite.com/2018/12/29/rabbitmq/index.html">
-<meta property="og:site_name" content="李超凡的读书笔记">
+<meta property="og:site_name" content="Reading Notes">
 <meta property="og:description" content="一文搞懂 RabbitMQ 的重要概念以及安装一 RabbitMQ 介绍这部分参考了 《RabbitMQ实战指南》这本书的第 1 章和第 2 章。
-1.1 RabbitMQ 简介RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。
-Rab">
+1.1 RabbitMQ 简介RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-16/96388546.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-16/24007899.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-16/70553134.jpg">
@@ -106,12 +104,11 @@ Rab">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-12/49570541.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-12/62504246.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-12/45835332.jpg">
-<meta property="og:updated_time" content="2019-01-09T09:29:54.544Z">
+<meta property="og:updated_time" content="2019-01-13T09:22:27.516Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="rabbitmq">
 <meta name="twitter:description" content="一文搞懂 RabbitMQ 的重要概念以及安装一 RabbitMQ 介绍这部分参考了 《RabbitMQ实战指南》这本书的第 1 章和第 2 章。
-1.1 RabbitMQ 简介RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。
-Rab">
+1.1 RabbitMQ 简介RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。">
 <meta name="twitter:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-16/96388546.jpg">
 
 
@@ -146,7 +143,7 @@ Rab">
 
 
 
-  <title> rabbitmq | 李超凡的读书笔记 </title>
+  <title> rabbitmq | Reading Notes </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -182,7 +179,7 @@ Rab">
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">李超凡的读书笔记</span>
+        <span class="site-title">Reading Notes</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -284,7 +281,7 @@ Rab">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李超凡的读书笔记">
+      <meta itemprop="name" content="Reading Notes">
     </span>
 
     
@@ -381,7 +378,7 @@ Rab">
 
       
         <h1 id="一文搞懂-RabbitMQ-的重要概念以及安装"><a href="#一文搞懂-RabbitMQ-的重要概念以及安装" class="headerlink" title="一文搞懂 RabbitMQ 的重要概念以及安装"></a>一文搞懂 RabbitMQ 的重要概念以及安装</h1><h2 id="一-RabbitMQ-介绍"><a href="#一-RabbitMQ-介绍" class="headerlink" title="一 RabbitMQ 介绍"></a>一 RabbitMQ 介绍</h2><p>这部分参考了 《RabbitMQ实战指南》这本书的第 1 章和第 2 章。</p>
-<h3 id="1-1-RabbitMQ-简介"><a href="#1-1-RabbitMQ-简介" class="headerlink" title="1.1 RabbitMQ 简介"></a>1.1 RabbitMQ 简介</h3><p>RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。</p>
+<h3 id="1-1-RabbitMQ-简介"><a href="#1-1-RabbitMQ-简介" class="headerlink" title="1.1 RabbitMQ 简介"></a>1.1 RabbitMQ 简介</h3><p>RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。<br><a id="more"></a></p>
 <p>RabbitMQ 发展到今天，被越来越多的人认可，这和它在易用性、扩展性、可靠性和高可用性等方面的卓著表现是分不开的。RabbitMQ 的具体特点可以概括为以下几点：</p>
 <ul>
 <li><strong>可靠性：</strong> RabbitMQ使用一些机制来保证消息的可靠性，如持久化、传输确认及发布确认等。</li>
